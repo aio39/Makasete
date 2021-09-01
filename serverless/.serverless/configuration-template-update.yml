@@ -1,0 +1,19 @@
+resources:
+  - type: storage.v1.bucket
+    name: sls-serverless-dev-1630407891849
+    properties:
+      location: asia-northeast3
+  - type: gcp-types/cloudfunctions-v1:projects.locations.functions
+    name: serverless-dev-first
+    properties:
+      parent: projects/makasete/locations/asia-northeast3
+      availableMemoryMb: 256
+      runtime: nodejs
+      timeout: 60s
+      entryPoint: http
+      function: serverless-dev-first
+      sourceArchiveUrl: >-
+        gs://sls-serverless-dev-1630407891849/serverless/serverless/dev/1630407899562-2021-08-31T11:04:59.562Z/serverless.zip
+      labels: {}
+      httpsTrigger:
+        url: path

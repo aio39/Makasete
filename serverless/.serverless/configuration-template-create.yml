@@ -1,0 +1,5 @@
+resources:
+  - type: storage.v1.bucket
+    name: sls-serverless-dev-1630407891849
+    properties:
+      location: asia-northeast3

@@ -1,0 +1,23 @@
+{
+  "name": "serverless",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "helloworld": "functions-framework --target=helloWorld",
+    "ocr": "functions-framework --target=ocr2"
+  },
+  "author": "serverless.com",
+  "license": "MIT",
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^1.9.0",
+    "serverless-google-cloudfunctions": "*",
+    "serverless-offline": "^8.0.0"
+  },
+  "dependencies": {
+    "@google-cloud/vision": "^2.3.8",
+    "await-busboy": "^1.0.3",
+    "busboy": "^0.3.1"
+  }
+}
