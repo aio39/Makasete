@@ -5,10 +5,10 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {},
-    colors: {
-      transparent: 'transparent',
-      current: 'currentColor',
-    },
+    // colors: {
+    //   transparent: 'transparent',
+    //   current: 'currentColor',
+    // },
   },
   variants: {
     extend: {},

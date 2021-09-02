@@ -1,27 +1,17 @@
 import React from 'react';
+import ImageUpload from './components/ImageUpload';
 // import './App.css';
 import './index.css';
-import logo from './logo.svg';
 
 function App() {
   return (
-    <div className="App">
+    <div className="App min-h-screen min-w-full flex flex-col justify-center items-center">
       <header className="App-header">
-        <div className="w-max h-max flex flex-col  ">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <p className="text-9xl ">Big</p>
-      </div>
+        <div className=" ">
+          {/* <img src={logo} className="App-logo" alt="logo" /> */}
+
+          <ImageUpload />
+        </div>
       </header>
     </div>
   );

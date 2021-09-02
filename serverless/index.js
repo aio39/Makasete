@@ -9,79 +9,19 @@ exports.event = (event, callback) => {
 
 const vision = require('@google-cloud/vision');
 const Busboy = require('busboy');
-
-exports.ocr = async (req, res) => {
-  console.log(req.headers);
-  const fields = {};
-
-  const bb = new Busboy({ headers: req.headers });
-
-  await new Promise((resolve, reject) => {
-    bb.on('field', (fieldname, val) => {
-      /**
-       *  TODO(developer): Process submitted field values here
-       */
-      console.log(`Processed field ${fieldname}: ${val}.`);
-      fields[fieldname] = val;
-    }).on('finish', resolve);
-    bb.end(req.headers);
-  });
-
-  console.log(fields.img);
-
-  const client = new vision.ImageAnnotatorClient();
-  try {
-    const [result] = await client.textDetection(
-      'https://www.researchgate.net/profile/Victoria-Yaneva/publication/330117253/figure/tbl7/AS:711057735700480@1546540783264/1-Examples-of-easy-and-difficult-sentences-from-Laufer-and-Nations.png'
-    );
-    const detections = result.textAnnotations;
-    res.status(200).send(detections);
-  } catch (error) {
-    res.status(404).send(error);
-  }
-};
-
-const parse = require('await-busboy');
-
-const parsingFrom = (req) => {
-  const busboy = new Busboy({ headers: req.headers });
-  const fields = [];
-  console.log(fields);
-  return new Promise((res, rej) => {
-    busboy.on('file', (fieldname, file, filename) => {
-      // Note: os.tmpdir() points to an in-memory file system on GCF
-      // Thus, any files in it must fit in the instance's memory.
-
-      console.log(file);
-      fields.push(file);
-      res(file);
-    });
-    // busboy.on('error', (err) => {
-    //   console.error(err);
-    // });
-    // busboy.on('finish', () => {
-    //   console.log('finish');
-    //   res(fields);
-    // });
-  });
-};
-
-exports.ocr3 = async (req, res) => {
-  const result = await parsingFrom(req).catch((err) => {
-    console.log(err);
-  });
-  console.log('here');
-  res.status(200).send(result);
-};
+const axios = require('axios');
 
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
-// Node.js doesn't have a built-in multipart/form-data parsing library.
-// Instead, we can use the 'busboy' library from NPM to parse these requests.
-
 exports.ocr2 = (req, res) => {
+  // NOTE  localhost:3000 설정.
+  res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.set('Access-Control-Allow-Credentials', 'true');
+  res.set('Access-Control-Allow-Methods', 'POST');
+  res.set('Access-Control-Allow-Headers', 'Authorization');
+  res.set('Access-Control-Max-Age', '3600');
   if (req.method !== 'POST') {
     // Return a "method not allowed" error
     return res.status(405).end();
@@ -142,13 +82,44 @@ exports.ocr2 = (req, res) => {
     console.log(chunks[0]);
 
     const client = new vision.ImageAnnotatorClient();
-    const [result] = await client.textDetection(chunks[0]);
+    const requests = [{}];
+
+    const [result] = await client
+      .textDetection({
+        image: {
+          content: new Uint8Array(chunks[0]),
+        },
+      })
+      .catch((err) => {
+        console.err(err);
+      });
     for (const file in uploads) {
       console.log(uploads[file]);
       console.log(fileWrites);
       fs.unlinkSync(uploads[file]);
     }
-    res.send(result);
+    const text = result.fullTextAnnotation.text;
+    const splittedText = text.replace(/[\w)|]/gi, '');
+
+    const { data } = await axios
+      .post('https://labs.goo.ne.jp/api/hiragana', {
+        app_id:
+          '5f82101255bc786575ef667938d33a5f8afccc2e54aa4638dd81230aa06c26e8',
+        sentence: splittedText,
+        output_type: 'hiragana',
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    console.log(data);
+
+    const data2 = data.converted.split('  ').reduce((acu, cur) => {
+      const trim = cur.trim();
+      if (trim !== '') acu.push(trim);
+      return acu;
+    }, []);
+    res.send(data2);
   });
 
   busboy.end(req.rawBody);
