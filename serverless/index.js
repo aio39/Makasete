@@ -14,6 +14,7 @@ const axios = require('axios');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
+const sharp = require('sharp');
 
 exports.ocr2 = (req, res) => {
   // NOTE  localhost:3000 설정.
@@ -82,44 +83,78 @@ exports.ocr2 = (req, res) => {
     console.log(chunks[0]);
 
     const client = new vision.ImageAnnotatorClient();
-    const requests = [{}];
-
-    const [result] = await client
-      .textDetection({
-        image: {
-          content: new Uint8Array(chunks[0]),
-        },
+    const metadata = await sharp(chunks[0]).rotate().metadata();
+    const crop = [];
+    crop[0] = await sharp(chunks[0])
+      .extract({
+        left: 0,
+        top: metadata.height / 2,
+        height: metadata.height / 2,
+        width: metadata.width,
       })
-      .catch((err) => {
-        console.err(err);
-      });
+      .toBuffer();
+    crop[1] = await sharp(chunks[0])
+      .extract({
+        left: 0,
+        top: 0,
+        height: metadata.height / 2,
+        width: metadata.width,
+      })
+      .toBuffer();
+
+    const finalResult = [];
+    const result = await Promise.all(
+      crop.map((chunk) =>
+        client
+          .textDetection({
+            image: {
+              content: new Uint8Array(chunk),
+            },
+          })
+          .catch((err) => {
+            console.err(err);
+          })
+      )
+    );
     for (const file in uploads) {
       console.log(uploads[file]);
       console.log(fileWrites);
       fs.unlinkSync(uploads[file]);
     }
-    const text = result.fullTextAnnotation.text;
-    const splittedText = text.replace(/[\w)|]/gi, '');
+    console.log(result);
 
-    const { data } = await axios
-      .post('https://labs.goo.ne.jp/api/hiragana', {
-        app_id:
-          '5f82101255bc786575ef667938d33a5f8afccc2e54aa4638dd81230aa06c26e8',
-        sentence: splittedText,
-        output_type: 'hiragana',
+    await Promise.all(
+      result.map(async (list) => {
+        const text = list[0].fullTextAnnotation.text;
+        const removeNotJpn = text.replace(/[\w)(|]/gi, '').replace(/\n/, ' ');
+
+        const {
+          data: { converted },
+        } = await axios
+          .post('https://labs.goo.ne.jp/api/hiragana', {
+            app_id:
+              '5f82101255bc786575ef667938d33a5f8afccc2e54aa4638dd81230aa06c26e8',
+            sentence: removeNotJpn,
+            output_type: 'hiragana',
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
+        console.log(converted);
+        const origin = removeNotJpn.trim().split(' ');
+        const data2 = converted
+          .trim()
+          .split(' ')
+          .reduce((acu, cur) => {
+            const trim = cur.trim();
+            if (trim !== '') acu.push(trim);
+            return acu;
+          }, []);
       })
-      .catch((err) => {
-        console.log(err);
-      });
+    );
 
-    console.log(data);
-
-    const data2 = data.converted.split('  ').reduce((acu, cur) => {
-      const trim = cur.trim();
-      if (trim !== '') acu.push(trim);
-      return acu;
-    }, []);
-    res.send(data2);
+    res.send('data2');
   });
 
   busboy.end(req.rawBody);
