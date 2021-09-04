@@ -1,9 +1,10 @@
 service: serverless
+useDotenv: true
 
 provider:
   name: google
   stage: dev
-  runtime: nodejs
+  runtime: nodejs14
   region: asia-northeast3
   project: makasete
   # The GCF credentials can be a little tricky to set up. Luckily we've documented this for you here:
@@ -11,6 +12,10 @@ provider:
   #
   # the path to the credentials file needs to be absolute
   credentials: /home/aio/gcp/gcp_makasete.json
+  environment:
+    D2_ID: ${env:D2_ID}
+    D2_SECRET: ${env:D2_SECRET}
+    
 
 
 plugins:
@@ -30,10 +35,14 @@ package:
     - .git/**
 
 functions:
-  first:
-    handler: http
+  test:
+    handler: test
     events:
       - http: test
+  ocr:
+    handler: ocr
+    events:
+      - http: ocr
       
   # NOTE: the following uses an "event" event (pubSub event in this case).
   # Please create the corresponding resources in the Google Cloud
