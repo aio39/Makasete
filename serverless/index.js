@@ -1,5 +1,7 @@
 exports.test = async (request, response) => {
   const result = await Promise.resolve('ok');
+  
+
   response.status(200).send(result);
 };
 
@@ -46,34 +48,43 @@ const papago = async (text) => {
   }
 };
 
+const { Translate } = require('@google-cloud/translate').v2;
+const translate = async (textList) => {
+  const translate = new Translate({
+    projectId: process.env.GCP_PROJECT || 'makasete',
+  });
+  const option = {
+    from: 'ja',
+    to: 'ko',
+  };
+
+  const [translation] = await translate.translate(textList, option);
+  console.log(translation);
+  return translation;
+};
+
 exports.ocr = (req, res) => {
   // NOTE  localhost:3000 설정.
-  res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.set(
+    'Access-Control-Allow-Origin',
+    process.env.HOST || 'http://localhost:3000'
+  );
   res.set('Access-Control-Allow-Credentials', 'true');
   res.set('Access-Control-Allow-Methods', 'POST');
   res.set('Access-Control-Allow-Headers', 'Authorization');
   res.set('Access-Control-Max-Age', '3600');
   if (req.method !== 'POST') {
-    // Return a "method not allowed" error
     return res.status(405).end();
   }
   const busboy = new Busboy({ headers: req.headers });
   const tmpdir = os.tmpdir();
 
-  // This object will accumulate all the fields, keyed by their name
   const fields = {};
-
-  // This object will accumulate all the uploaded files, keyed by their name.
   const uploads = {};
 
-  let divide = 1;
+  let divide = 1; // default divide is 1
 
-  // This code will process each non-file field in the form.
   busboy.on('field', (fieldname, val, a, b, c, d) => {
-    /**
-     *  TODO(developer): Process submitted field values here
-     */
-    console.log(`Processed field ${fieldname}: ${val}.`);
     if (fieldname === 'divide') divide = parseInt(val);
     fields[fieldname] = val;
   });
@@ -156,8 +167,9 @@ exports.ocr = (req, res) => {
     console.log(detectedTextList);
 
     const finalResult = [];
+
     await Promise.all(
-      detectedTextList.map(async (chunk) => {
+      detectedTextList.map(async (chunk, resultIdx) => {
         const rawText = chunk[0].fullTextAnnotation.text;
         const kanjiText = rawText
           .replace(/[\w)(|]/gi, '') // 특수 문자 제거
@@ -166,15 +178,13 @@ exports.ocr = (req, res) => {
           .trim(); // 좌우 공백 제거
 
         const delimiter = '*';
-        const papagoDelimiter = 'A';
-
-        const kanjiTextWithDelimiter = kanjiText.replace(/( * )/g, delimiter);
+        const kanjiTextList = kanjiText.split(' ');
 
         const [
           {
             data: { converted: hiraganaText },
           },
-          hangulText,
+          hangulTextList,
         ] = await Promise.all([
           axios
             .post('https://labs.goo.ne.jp/api/hiragana', {
@@ -186,25 +196,21 @@ exports.ocr = (req, res) => {
             .catch((err) => {
               console.log(err);
             }),
-          papago(kanjiText.replace(/( * )/g, papagoDelimiter)),
+          translate(kanjiText.replace(/ /g, '。 ').split(' ')),
         ]);
 
-        // 아래 trim() 끝자리 공백 제거
-        const kanjiTextList = kanjiText.split(' ');
         const hiraganaTextList = hiraganaText
           .replace(/( * )+/g, '')
           .split(delimiter);
-        const hangulTextList = hangulText
-          ? hangulText.replace(/( * )/g, '').split(papagoDelimiter)
-          : null;
 
+        finalResult[resultIdx] = [];
         Array(kanjiTextList.length)
           .fill()
           .forEach((_, idx) => {
-            finalResult.push([
+            finalResult[resultIdx].push([
               kanjiTextList[idx],
               hiraganaTextList[idx],
-              ...(hangulTextList ? [hangulTextList[idx]] : []),
+              ...(hangulTextList ? [hangulTextList[idx].slice(0, -1)] : []),
             ]);
           });
       })

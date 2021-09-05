@@ -25,3 +25,5 @@ yarn-error.log*
 serverless/.serverless/**
 serverless/.serverless
 serverless/.env.json
+serverless/.serverless/configuration-template-update.yml
+serverless/.serverless/serverless.zip

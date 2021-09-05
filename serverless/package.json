@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "helloworld": "functions-framework --target=helloWorld",
+    "helloworld": "functions-framework --target=test",
     "ocr": "cross-env-file -p ./.env.json functions-framework --target=ocr"
   },
   "author": "serverless.com",
@@ -19,6 +19,7 @@
     "serverless-offline": "^8.0.0"
   },
   "dependencies": {
+    "@google-cloud/translate": "^6.2.7",
     "@google-cloud/vision": "^2.3.8",
     "await-busboy": "^1.0.3",
     "axios": "^0.21.1",
