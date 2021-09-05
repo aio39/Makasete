@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import Crop from './components/Crop';
 import ImageUpload from './components/ImageUpload';
 import WordList from './components/WordList';
 // import './App.css';
@@ -37,6 +38,7 @@ function App() {
 
           <ImageUpload />
           {isExist && <WordList />}
+          <Crop />
         </div>
       </header>
     </div>

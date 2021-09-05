@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useRecoilState } from 'recoil';
@@ -24,13 +23,13 @@ const ImageUpload = () => {
       setImage(e.target.files[0]);
       const params = new FormData();
       params.append('image', e.target.files[0]);
-      const result = await axios.post('http://localhost:8080', params, {
-        headers: {
-          'content-type': 'multipart/form-data',
-        },
-        withCredentials: true,
-      });
-      console.log(result);
+      // const result = await axios.post('http://localhost:8080', params, {
+      //   headers: {
+      //     'content-type': 'multipart/form-data',
+      //   },
+      //   withCredentials: true,
+      // });
+      // console.log(result);
     }
 
     console.log(e);
