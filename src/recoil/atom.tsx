@@ -8,7 +8,7 @@ export const isDarkModeState = atom({
 // export const isDarkMode = selector({
 //   key: 'charCountState', // unique ID (with respect to other atoms/selectors)
 //   get: ({ get }) => {
-//     const wordList = get(textState);
+//     const wordList = get(isDarkModeState);
 
 //     return wordList.length;
 //   },

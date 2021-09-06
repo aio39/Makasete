@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import Navigation from './components/header/Navigation';
 import ImageUpload from './components/ImageUpload';
 import WordList from './components/WordList';
 import WordListNav from './components/WordListNav';
@@ -29,8 +30,8 @@ function App() {
   return (
     <div className={`App   ${isDarkMode ? 'dark bg-black' : 'bg-white'} `}>
       <div className="dark:bg-black dark:text-white h-full w-full  flex flex-col justify-center items-center  px-4 md:px-8">
+        <Navigation />
         {/* <img src={logo} className="App-logo" alt="logo" /> */}
-
         <ImageUpload />
         {isExist && <WordList />}
         {/* <Crop /> */}
