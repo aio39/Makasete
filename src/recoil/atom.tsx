@@ -27,14 +27,45 @@ export const textState = atom({
       ['言い分', 'いいぶん', '이론'],
       ['確認', 'かくにん', '확인'],
     ],
+    [
+      ['迷う', 'まよう', '좌절된다'],
+      ['言い分', 'いいぶん', '이론'],
+      ['確認', 'かくにん', '확인'],
+    ],
+    [
+      ['迷う', 'まよう', '좌절된다'],
+      ['言い分', 'いいぶん', '이론'],
+      ['確認', 'かくにん', '확인'],
+    ],
+    [
+      ['迷う', 'まよう', '좌절된다'],
+      ['言い分', 'いいぶん', '이론'],
+      ['確認', 'かくにん', '확인'],
+    ],
+    [
+      ['迷う', 'まよう', '좌절된다'],
+      ['言い分', 'いいぶん', '이론'],
+      ['確認', 'かくにん', '확인'],
+    ],
+    [
+      ['迷う', 'まよう', '좌절된다'],
+      ['言い分', 'いいぶん', '이론'],
+      ['確認', 'かくにん', '확인'],
+    ],
+    [
+      ['迷う', 'まよう', '좌절된다'],
+      ['言い分', 'いいぶん', '이론'],
+      ['確認', 'かくにん', '확인'],
+    ],
   ],
 });
 
-export const isWordListExist = selector({
-  key: 'charCountState', // unique ID (with respect to other atoms/selectors)
+export const wordListLength = selector({
+  key: 'isWordListExist', // unique ID (with respect to other atoms/selectors)
   get: ({ get }) => {
     const wordList = get(textState);
 
     return wordList.length;
   },
 });
+

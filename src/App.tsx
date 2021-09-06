@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import Crop from './components/Crop';
 import ImageUpload from './components/ImageUpload';
 import WordList from './components/WordList';
+import WordListNav from './components/WordListNav';
 // import './App.css';
 import './index.css';
-import { isDarkModeState, isWordListExist } from './recoil/atom';
+import { isDarkModeState, wordListLength } from './recoil/atom';
 
 function App() {
-  const isExist = useRecoilValue(isWordListExist);
+  const isExist = useRecoilValue(wordListLength);
   const [isDarkMode, setIsDarkMode] = useRecoilState(isDarkModeState);
 
   useEffect(() => {
@@ -27,20 +27,16 @@ function App() {
   }, []);
 
   return (
-    <div
-      className={`App h-full w-full flex flex-col justify-center items-center box-border  ${
-        isDarkMode ? 'dark bg-black' : 'bg-white'
-      } `}
-    >
-      <header className="App-header">
-        <div className="dark:bg-black dark:text-white ">
-          {/* <img src={logo} className="App-logo" alt="logo" /> */}
+    <div className={`App   ${isDarkMode ? 'dark bg-black' : 'bg-white'} `}>
+      <div className="dark:bg-black dark:text-white h-full w-full  flex flex-col justify-center items-center  px-4 md:px-8">
+        {/* <img src={logo} className="App-logo" alt="logo" /> */}
 
-          <ImageUpload />
-          {isExist && <WordList />}
-          <Crop />
-        </div>
-      </header>
+        <ImageUpload />
+        {isExist && <WordList />}
+        {/* <Crop /> */}
+      </div>
+      <WordListNav />
+      <footer className="bg-gray-400 h-28"></footer>
     </div>
   );
 }

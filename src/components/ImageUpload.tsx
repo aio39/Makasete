@@ -63,18 +63,23 @@ const ImageUpload = () => {
       const params = new FormData();
       params.append('image', e.target.files[0]);
       params.append('divide', divideCount);
-      const result = await axios.post<string[][][]>(
-        'http://localhost:8080',
-        params,
-        {
-          headers: {
-            'content-type': 'multipart/form-data',
-          },
-          withCredentials: true,
-        }
-      );
-      console.log(result);
-      setTextSate(result.data);
+      try {
+        const result = await axios.post<string[][][]>(
+          process.env.REACT_APP_OCR_URL as string,
+          params,
+          {
+            headers: {
+              'content-type': 'multipart/form-data',
+            },
+            withCredentials: true,
+          }
+        );
+        console.log(result);
+        setTextSate(result.data);
+      } catch (error) {
+        console.log(error);
+        alert(error);
+      }
     }
 
     console.log(e);
@@ -84,11 +89,11 @@ const ImageUpload = () => {
   const handleDivideRadio = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDivideCount(e.target.value);
   };
-
+  console.log(process.env.development);
   return (
-    <section>
+    <section className="w-full max-w-lg">
       <div
-        className=" h-40 border-2 px-4 py-6  border-mint border-dashed  hover:bg-mint hover:text-white cursor-pointer "
+        className=" h-20  border-2 px-4 py-6  border-mint border-dashed  hover:bg-mint hover:text-white cursor-pointer "
         {...getRootProps({})}
       >
         <label htmlFor="wordImg">분석할 사진</label>
@@ -104,15 +109,28 @@ const ImageUpload = () => {
         <p>드래그드랍 또는 클릭으로 단어 사진 업로드</p>
       </div>
       <div onChange={handleDivideRadio}>
-        <input type="radio" name="divide" id="divide no" value="1" checked />
+        <input
+          type="radio"
+          name="divide"
+          id="divide no"
+          value="1"
+          defaultChecked
+          // checked={divideCount === '1'}
+        />
         <label htmlFor="divideOne">원본</label>
-        <input type="radio" name="divide" id="divide no" value="2" />
+        <input
+          type="radio"
+          name="divide"
+          id="divide no"
+          value="2"
+          // checked={divideCount === '2'}
+        />
         <label htmlFor="divideTwo">반으로 나누기</label>
       </div>
       <div>
-        <canvas ref={uploadedImageRef} className="h-72 " />
+        <canvas ref={uploadedImageRef} className="h-72 w-full " />
       </div>
-
+      {process.env.development}
       <ul>{files}</ul>
       <div>
         <button type="button">크롭하기</button>
