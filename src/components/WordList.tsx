@@ -5,9 +5,9 @@ import { textState } from '../recoil/atom';
 const WordList: FC<any> = () => {
   const [text, setText] = useRecoilState(textState);
   return (
-    <div className="min-w-full">
+    <div className="min-w-full flex flex-wrap">
       {text.map((list, idxA) => (
-        <div id={'list' + (idxA + 1)}>
+        <div id={'list' + (idxA + 1)} className="w-full flex-grow ">
           <div>
             <h2>단어 리스트 {idxA + 1}</h2>
           </div>

@@ -91,9 +91,9 @@ const ImageUpload = () => {
   };
   console.log(process.env.development);
   return (
-    <section className="w-full max-w-lg">
+    <section className="w-full flex flex-col items-center">
       <div
-        className=" h-20  border-2 px-4 py-6  border-mint border-dashed  hover:bg-mint hover:text-white cursor-pointer "
+        className=" h-40 w-full max-w-screen-md  border-2 px-4 py-6  border-mint border-dashed  hover:bg-mint hover:text-white cursor-pointer "
         {...getRootProps({})}
       >
         <label htmlFor="wordImg">분석할 사진</label>
