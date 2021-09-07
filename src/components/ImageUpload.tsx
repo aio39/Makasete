@@ -6,6 +6,7 @@ import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { textState } from '../recoil/atom';
+import { dataURItoBlob } from '../util/dataURItoBlob';
 
 const ImageUpload = () => {
   const [crop, setCrop] = useState({ unit: '%' });
@@ -19,10 +20,12 @@ const ImageUpload = () => {
 
   // const uploadedImageRef = useRef<HTMLCanvasElement>(null);
 
-  const [cropImageList, setCropImageList] = useState<string[]>([]);
+  const [croppedImageDataUrlList, setCroppedImageDataUrlList] = useState<
+    string[]
+  >([]);
 
   const [divideCount, setDivideCount] = useState('1');
-  const setTextSate = useSetRecoilState(textState);
+  const setTextState = useSetRecoilState(textState);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log(e);
@@ -36,7 +39,6 @@ const ImageUpload = () => {
   const onDrop = useCallback((acceptedFiles) => {
     acceptedFiles.forEach((file: File) => {
       const reader = new FileReader();
-
       reader.onabort = () => console.log('file reading was aborted');
       reader.onerror = () => console.log('file reading has failed');
       reader.onload = () => {
@@ -78,6 +80,37 @@ const ImageUpload = () => {
     </li>
   ));
 
+  const handleSendToServer = async () => {
+    const result = await Promise.all(
+      croppedImageDataUrlList.map(async (dataUrl) => {
+        const params = new FormData();
+        console.log(dataURItoBlob(dataUrl));
+        params.append('image', dataURItoBlob(dataUrl));
+        params.append('divide', divideCount);
+        try {
+          // return;
+          const result = await axios.post<string[][][]>(
+            process.env.REACT_APP_OCR_URL as string,
+            params,
+            {
+              headers: {
+                'content-type': 'multipart/form-data',
+              },
+              withCredentials: true,
+            }
+          );
+          console.log(result);
+          return result.data;
+          setTextState(result.data);
+        } catch (error) {
+          console.log(error);
+          alert(error);
+        }
+      })
+    );
+    setTextState((pre) => [...pre, ...(result as string[][][][]).flat()]);
+  };
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
       setUploadedImage(e.target.files[0]);
@@ -97,7 +130,7 @@ const ImageUpload = () => {
           }
         );
         console.log(result);
-        setTextSate(result.data);
+        setTextState(result.data);
       } catch (error) {
         console.log(error);
         alert(error);
@@ -154,8 +187,11 @@ const ImageUpload = () => {
     setDivideCount(e.target.value);
   };
 
-  const handleCrop = () => {
-    setCropImageList((pre) => [...pre, latestCropDataUrl.current as string]);
+  const handleConfirmCrop = () => {
+    setCroppedImageDataUrlList((pre) => [
+      ...pre,
+      latestCropDataUrl.current as string,
+    ]);
   };
 
   const handleResetCrop = () => {
@@ -164,7 +200,7 @@ const ImageUpload = () => {
 
   const handleDeleteCrop = (e: any) => {
     console.log(e.target.dataset.idx);
-    setCropImageList((pre) => {
+    setCroppedImageDataUrlList((pre) => {
       const temp = [...pre];
       temp.splice(parseInt(e.target.dataset.idx), 1);
       return temp;
@@ -183,7 +219,7 @@ const ImageUpload = () => {
             type: 'file',
             accept: 'image/*',
             alt: '분석할 단어 사진',
-            onChange: handleUpload,
+            // onChange: handleUpload,
           })}
         />
         <div className="h-6"></div>
@@ -205,7 +241,7 @@ const ImageUpload = () => {
         className="flex flex-row gap-4 w-full overflow-scroll mb-6"
         onClick={handleDeleteCrop}
       >
-        {cropImageList.map((imgUrl, idx) => (
+        {croppedImageDataUrlList.map((imgUrl, idx) => (
           <div
             key={'cropImage' + idx}
             className="group relative border-2 border-gray-700"
@@ -221,13 +257,22 @@ const ImageUpload = () => {
           </div>
         ))}
       </div>
-      {true && (
+      {!false && (
         <>
-          <button onClick={handleCrop} className="bg-mint text-white p-2">
+          <button
+            onClick={handleConfirmCrop}
+            className="bg-mint text-white p-2"
+          >
             자르기
           </button>
           <button onClick={handleResetCrop} className="bg-mint text-white p-2">
             자르기 리셋
+          </button>
+          <button
+            onClick={handleSendToServer}
+            className="bg-mint text-white p-2"
+          >
+            단어 리스트 생성
           </button>
         </>
       )}
