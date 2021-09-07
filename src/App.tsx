@@ -6,10 +6,15 @@ import WordList from './components/WordList';
 import WordListNav from './components/WordListNav';
 // import './App.css';
 import './index.css';
-import { isDarkModeState, wordListLength } from './recoil/atom';
+import {
+  isDarkModeState,
+  isNowEditingState,
+  wordListLength,
+} from './recoil/atom';
 
 function App() {
   const isExist = useRecoilValue(wordListLength);
+  const isNowEditing = useRecoilValue(isNowEditingState);
   const [isDarkMode, setIsDarkMode] = useRecoilState(isDarkModeState);
 
   useEffect(() => {
@@ -28,18 +33,20 @@ function App() {
   }, []);
 
   return (
-    <div className={`App   ${isDarkMode ? 'dark bg-black' : 'bg-white'} `}>
-      <div className="dark:bg-black dark:text-white h-full w-full  flex flex-col justify-center items-center ">
+    <div className={`App ${isDarkMode ? 'dark bg-black' : 'bg-white'} `}>
+      <div className="dark:bg-black dark:text-white  w-full   min-h-screen  justify-start  flex flex-col   items-center ">
         <Navigation />
         {/* <img src={logo} className="App-logo" alt="logo" /> */}
         <main className=" px-4 md:px-8">
           <ImageUpload />
-          {isExist && <WordList />}
+          <React.Suspense fallback={<div>laoding</div>}>
+            {isExist && <WordList />}
+          </React.Suspense>
         </main>
-
-        {/* <Crop /> */}
-        <WordListNav />
-        <footer className="bg-gray-400 w-full h-28"></footer>
+        <div className="flex-grow "></div>
+        {isNowEditing}
+        {isExist && <WordListNav />}
+        <footer className="bg-gray-400 w-full h-28 "></footer>
       </div>
     </div>
   );

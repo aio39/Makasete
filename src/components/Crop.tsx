@@ -27,7 +27,8 @@ const Crop = () => {
   const [upImg, setUpImg] = useState<string>();
   const imgRef = useRef<any>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  const [crop, setCrop] = useState({ unit: '%', width: 30, aspect: 16 / 9 });
+  // const [crop, setCrop] = useState({ unit: '%', width: 30, aspect: 16 / 9 });
+  const [crop, setCrop] = useState({ unit: '%', width: 30 });
   const [completedCrop, setCompletedCrop] = useState<HTMLImageElement | null>(
     null
   );
@@ -56,6 +57,8 @@ const Crop = () => {
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    // 하나의 CSS 픽셀을 그릴 때 사용해야 하는 장치 픽셀의 수
+    //  레티나 디스플레이에서 추가 픽셀 밀접도로 해상도를 올릴 수 있다.
     const pixelRatio = window.devicePixelRatio;
 
     canvas.width = crop.width * pixelRatio * scaleX;
@@ -90,6 +93,7 @@ const Crop = () => {
         onComplete={(c) => setCompletedCrop(c as any)}
       />
       <div>
+        "preview"
         <canvas
           ref={previewCanvasRef}
           // Rounding is important so the canvas width and height matches/is a multiple for sharpness.
@@ -99,10 +103,6 @@ const Crop = () => {
           }}
         />
       </div>
-      <p>
-        Note that the download below won't work in this sandbox due to the
-        iframe missing 'allow-downloads'. It's just for your reference.
-      </p>
       <button
         type="button"
         disabled={!completedCrop?.width || !completedCrop?.height}

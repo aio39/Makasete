@@ -20,7 +20,10 @@ module.exports = {
     },
   },
   variants: {
-    extend: {},
+    extend: {
+      display: ['group-hover'],
+      backgroundColor: ['group-hover'],
+    },
   },
   plugins: [
     require('@tailwindcss/forms'), // import tailwind forms
