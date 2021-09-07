@@ -207,6 +207,16 @@ const ImageUpload = () => {
     });
   };
 
+  // const handleCapturePhoto = (e: any) => {
+  //   navigator.mediaDevices.getUserMedia({ video: true }).then((mediaStream) => {
+  //     // Do something with the stream.
+
+  //     const track = mediaStream.getVideoTracks()[0]; // 시각적 부분 분리  ,MediaStreamTrack
+  //     const  imageCapture = new ImageCapture(track);
+
+  //   });
+  // };
+
   return (
     <section className="w-full flex flex-col items-center">
       <div
@@ -219,6 +229,7 @@ const ImageUpload = () => {
             type: 'file',
             accept: 'image/*',
             alt: '분석할 단어 사진',
+            capture: 'camera',
             // onChange: handleUpload,
           })}
         />
@@ -238,6 +249,7 @@ const ImageUpload = () => {
           className="max-w-screen-md"
         />
       </div>
+      {/* <button onClick={handleCapturePhoto}> 사진 촬영</button> */}
       <div className="overflow-scroll w-screen">
         <div
           className="flex flex-row justify-center gap-4 w-full mb-6 "
