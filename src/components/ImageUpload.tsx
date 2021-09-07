@@ -70,15 +70,19 @@ const ImageUpload = () => {
     });
   }, []);
 
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop,
   });
+  const { getRootProps: getRootProps2, getInputProps: getInputProps2 } =
+    useDropzone({
+      onDrop,
+    });
 
-  const files = acceptedFiles.map((file) => (
-    <li key={file.name}>
-      {file.name} - {file.size} bytes
-    </li>
-  ));
+  // const files = acceptedFiles.map((file) => (
+  //   <li key={file.name}>
+  //     {file.name} - {file.size} bytes
+  //   </li>
+  // ));
 
   const handleSendToServer = async () => {
     const result = await Promise.all(
@@ -224,23 +228,34 @@ const ImageUpload = () => {
 
   return (
     <section className="w-full flex flex-col items-center">
-      <div
-        className=" h-40 w-full flex flex-col relative justify-center items-center max-w-screen-md mb-6  border-2 px-4 py-2  border-mint border-dashed  hover:bg-mint hover:text-white cursor-pointer "
-        {...getRootProps({})}
-      >
-        <input
-          {...getInputProps({
-            id: 'wordImg',
-            type: 'file',
-            accept: 'image/*',
-            alt: '분석할 단어 사진',
-            // capture: 'camera',
-            onChange: testHandler,
-          })}
-        />
-        <div className="absolute -right-36 top-4 border-2 p-2 z-10 ">
+      <div className="h-40 w-full  max-w-screen-md mb-6 relative  border-2 px-4 py-2  border-mint border-dashed  hover:bg-mint hover:text-white cursor-pointer">
+        <div
+          className="flex flex-col justify-center items-center"
+          {...getRootProps({})}
+        >
           <input
             {...getInputProps({
+              id: 'wordImg',
+              type: 'file',
+              accept: 'image/*',
+              alt: '분석할 단어 사진',
+              // capture: 'camera',
+              onChange: testHandler,
+            })}
+          />
+
+          <div className="h-6"></div>
+          <IoCloudUploadOutline className="text-6xl mb-4 " />
+          <div className="h-6">
+            <p>드랍 또는 클릭으로 사진 업로드</p>
+          </div>
+        </div>
+        <div
+          {...getRootProps2({})}
+          className=" absolute right-4 top-4 border-2 p-2 z-10 "
+        >
+          <input
+            {...getInputProps2({
               id: 'wordImg',
               type: 'file',
               accept: 'image/*',
@@ -251,12 +266,8 @@ const ImageUpload = () => {
           />
           <IoCamera className="text-4xl" />
         </div>
-        <div className="h-6"></div>
-        <IoCloudUploadOutline className="text-6xl mb-4 " />
-        <div className="h-6">
-          <p>드랍 또는 클릭으로 사진 업로드</p>
-        </div>
       </div>
+
       <div>
         <ReactCrop
           src={uploadedImage as string} // 크롭할 이미지 데이터
