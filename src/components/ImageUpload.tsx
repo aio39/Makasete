@@ -199,7 +199,7 @@ const ImageUpload = () => {
   };
 
   const handleDeleteCrop = (e: any) => {
-    console.log(e.target.dataset.idx);
+    console.log(e);
     setCroppedImageDataUrlList((pre) => {
       const temp = [...pre];
       temp.splice(parseInt(e.target.dataset.idx), 1);
@@ -235,27 +235,34 @@ const ImageUpload = () => {
           crop={crop as any}
           onChange={(c) => setCrop(c as any)}
           onComplete={(c) => setCompletedCrop(c as any)}
+          className="max-w-screen-md"
         />
       </div>
-      <div
-        className="flex flex-row gap-4 w-full overflow-scroll mb-6"
-        onClick={handleDeleteCrop}
-      >
-        {croppedImageDataUrlList.map((imgUrl, idx) => (
-          <div
-            key={'cropImage' + idx}
-            className="group relative border-2 border-gray-700"
-          >
-            <button
-              data-idx={idx}
-              className="hidden z-10 group-hover:block absolute text-2xl m-auto inset-0 w-full  cursor-pointer "
+      <div className="overflow-scroll w-screen">
+        <div
+          className="flex flex-row justify-center gap-4 w-full mb-6 "
+          onClick={handleDeleteCrop}
+        >
+          {croppedImageDataUrlList.map((imgUrl, idx) => (
+            <div
+              key={'cropImage' + idx}
+              className="group w-40 h-40 relative border-2 border-gray-700 flex-shrink-0"
             >
-              삭제
-            </button>
-            <div className="absolute m-auto w-full h-full bg-gray-700  bg-opacity-0 group-hover:bg-opacity-50"></div>
-            <img src={imgUrl} className="w-40 h-40 " />
-          </div>
-        ))}
+              <button
+                data-idx={idx}
+                className="hidden z-10 group-hover:block absolute text-2xl m-auto inset-0 w-full  cursor-pointer "
+              >
+                삭제
+              </button>
+              <div className="absolute m-auto w-full h-full bg-gray-700  bg-opacity-0 group-hover:bg-opacity-50"></div>
+              <img
+                src={imgUrl}
+                className="w-40 h-40 "
+                alt={`크롭된 이미지 ${idx}`}
+              />
+            </div>
+          ))}
+        </div>
       </div>
       {!false && (
         <>
@@ -280,17 +287,24 @@ const ImageUpload = () => {
         ref={previewCanvasRef}
         // Rounding is important so the canvas width and height matches/is a multiple for sharpness.
       />
-      <div onChange={handleDivideRadio}>
-        <input
-          type="radio"
-          name="divide"
-          id="divide no"
-          value="1"
-          defaultChecked
-        />
-        <label htmlFor="divideOne">원본</label>
-        <input type="radio" name="divide" id="divide no" value="2" />
-        <label htmlFor="divideTwo">반으로 나누기</label>
+      <div
+        onChange={handleDivideRadio}
+        className="flex justify-start my-6 gap-4  "
+      >
+        <label htmlFor="divideOne">
+          <input
+            type="radio"
+            name="divide"
+            id="divide no"
+            value="1"
+            defaultChecked
+          />
+          <span>원본</span>
+        </label>
+        <label htmlFor="divideTwo">
+          <input type="radio" name="divide" id="divide no" value="2" />
+          반으로 나누기
+        </label>
       </div>
     </section>
   );
