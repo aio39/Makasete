@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { IoCloudUploadOutline } from 'react-icons/io5';
+import { IoCamera, IoCloudUploadOutline } from 'react-icons/io5';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { useRecoilState, useSetRecoilState } from 'recoil';
@@ -217,10 +217,15 @@ const ImageUpload = () => {
   //   });
   // };
 
+  const testHandler = (e: any) => {
+    console.log(e);
+    console.log(e.target);
+  };
+
   return (
     <section className="w-full flex flex-col items-center">
       <div
-        className=" h-40 w-full flex flex-col justify-center items-center max-w-screen-md mb-6  border-2 px-4 py-2  border-mint border-dashed  hover:bg-mint hover:text-white cursor-pointer "
+        className=" h-40 w-full flex flex-col relative justify-center items-center max-w-screen-md mb-6  border-2 px-4 py-2  border-mint border-dashed  hover:bg-mint hover:text-white cursor-pointer "
         {...getRootProps({})}
       >
         <input
@@ -229,10 +234,23 @@ const ImageUpload = () => {
             type: 'file',
             accept: 'image/*',
             alt: '분석할 단어 사진',
-            capture: 'camera',
-            // onChange: handleUpload,
+            // capture: 'camera',
+            onChange: testHandler,
           })}
         />
+        <div className="absolute -right-36 top-4 border-2 p-2 z-10 ">
+          <input
+            {...getInputProps({
+              id: 'wordImg',
+              type: 'file',
+              accept: 'image/*',
+              alt: '분석할 단어 사진',
+              capture: 'camera',
+              onChange: testHandler,
+            })}
+          />
+          <IoCamera className="text-4xl" />
+        </div>
         <div className="h-6"></div>
         <IoCloudUploadOutline className="text-6xl mb-4 " />
         <div className="h-6">
