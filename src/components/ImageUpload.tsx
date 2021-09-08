@@ -7,6 +7,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { isLoadingOcrState, textState } from '../recoil/atom';
 import { dataURItoBlob } from '../util/dataURItoBlob';
+import rotateDataUrlOfImage from '../util/rotateImage';
 
 const ImageUpload = () => {
   const [crop, setCrop] = useState({ unit: '%' });
@@ -33,7 +34,7 @@ const ImageUpload = () => {
   };
   const [text, setText] = useRecoilState(textState);
 
-  const onLoad = useCallback((img) => {
+  const onLoad = useCallback((img: HTMLImageElement) => {
     cropTargetImageRef.current = img;
   }, []);
 
@@ -86,6 +87,7 @@ const ImageUpload = () => {
   // ));
 
   const handleSendToServer = async () => {
+    console.log('send to server now');
     setIsLoadingOcr(true);
 
     const result = await Promise.all(
@@ -106,16 +108,26 @@ const ImageUpload = () => {
               withCredentials: true,
             }
           );
-          console.log(result);
+
           return result.data;
-          setTextState(result.data);
         } catch (error) {
           console.log(error);
           alert(error);
+          throw new Error('error');
         }
       })
-    );
-    setIsLoadingOcr(false);
+    )
+      .catch((err) => {
+        return;
+      })
+      .finally(() => {
+        setIsLoadingOcr(false);
+      });
+    console.log('promise all result');
+    console.log(result);
+
+    if (!result) return;
+
     setTextState((pre) => [...pre, ...(result as string[][][][]).flat()]);
   };
 
@@ -230,6 +242,15 @@ const ImageUpload = () => {
     console.log(e.target);
   };
 
+  const handleRotateImage = async () => {
+    const newDataUrl = await rotateDataUrlOfImage(
+      cropTargetImageRef.current?.getAttribute('src') as string
+    );
+    cropTargetImageRef.current?.setAttribute('src', newDataUrl);
+  };
+
+  console.log();
+
   return (
     <section className="w-full flex flex-col items-center">
       <div className="h-40 w-full  max-w-screen-md mb-6 relative  border-2 px-4 py-2  border-mint border-dashed  hover:bg-mint hover:text-white cursor-pointer">
@@ -311,7 +332,7 @@ const ImageUpload = () => {
         </div>
       </div>
       {!false && (
-        <>
+        <div className="flex justify-center gap-4 ">
           <button
             onClick={handleConfirmCrop}
             className="bg-mint text-white p-2"
@@ -327,7 +348,13 @@ const ImageUpload = () => {
           >
             단어 리스트 생성
           </button>
-        </>
+          <button
+            onClick={handleRotateImage}
+            className="bg-mint text-white p-2"
+          >
+            사진 회전
+          </button>
+        </div>
       )}
       <canvas
         ref={previewCanvasRef}

@@ -15,6 +15,7 @@ import {
   wordListLength,
 } from './recoil/atom';
 
+
 function App() {
   const isExist = useRecoilValue(wordListLength);
   const isNowEditing = useRecoilValue(isNowEditingState);
