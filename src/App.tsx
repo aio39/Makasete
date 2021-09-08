@@ -1,13 +1,16 @@
 import React, { useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import Footer from './components/footer/footer';
 import Navigation from './components/header/Navigation';
 import ImageUpload from './components/ImageUpload';
+import Loading from './components/Loading';
 import WordList from './components/WordList';
 import WordListNav from './components/WordListNav';
 // import './App.css';
 import './index.css';
 import {
   isDarkModeState,
+  isLoadingOcrState,
   isNowEditingState,
   wordListLength,
 } from './recoil/atom';
@@ -15,8 +18,15 @@ import {
 function App() {
   const isExist = useRecoilValue(wordListLength);
   const isNowEditing = useRecoilValue(isNowEditingState);
+  const isLoadingOcr = useRecoilValue(isLoadingOcrState);
   const [isDarkMode, setIsDarkMode] = useRecoilState(isDarkModeState);
 
+  const worker = new Worker('./pwa/test.js');
+  console.log(worker);
+  worker.postMessage('hello');
+  // worker.onmessage((a) => {
+  //   console.log(a);
+  // });
   useEffect(() => {
     if (!window.localStorage) return;
     const browserPrefersColorScheme = window.matchMedia(
@@ -33,20 +43,25 @@ function App() {
   }, []);
 
   return (
-    <div className={`App ${isDarkMode ? 'dark bg-black' : 'bg-white'} `}>
-      <div className="dark:bg-black dark:text-white  w-full   min-h-screen  justify-start  flex flex-col   items-center ">
+    <div
+      className={`App  box-border ${
+        isDarkMode ? 'dark bg-black' : 'bg-white'
+      } max-w-screen  `}
+    >
+      <div className="dark:bg-black dark:text-white  w-full min-h-screen  justify-start  flex flex-col   items-center ">
         <Navigation />
         {/* <img src={logo} className="App-logo" alt="logo" /> */}
-        <main className=" px-4 md:px-8">
+        <main className="w-full px-6 md:mx-8 ">
           <ImageUpload />
-          <React.Suspense fallback={<div>laoding</div>}>
-            {isExist && <WordList />}
+          <React.Suspense fallback={<div>loading !!!</div>}>
+            {isLoadingOcr ? <Loading /> : ''}
+            {isExist ? <WordList /> : ''}
           </React.Suspense>
         </main>
         <div className="flex-grow "></div>
-        {isNowEditing}
-        {isExist && <WordListNav />}
-        <footer className="bg-gray-400 w-full h-28 "></footer>
+        {isNowEditing ? <span>is now editing</span> : ''}
+        {isExist ? <WordListNav /> : ''}
+        <Footer />
       </div>
     </div>
   );

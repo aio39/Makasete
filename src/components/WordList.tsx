@@ -23,9 +23,6 @@ const WordList: FC<any> = () => {
                     <span className=" ">{word[idx]}</span>
                   </div>
                 ))}
-
-              {/* <span className="overflow-hidden">{word[1]}</span> */}
-              {/* <span className="overflow-hidden">{word[2]}</span> */}
               <div>V</div>
             </li>
           ))}

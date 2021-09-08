@@ -5,7 +5,7 @@ import { IoCamera, IoCloudUploadOutline } from 'react-icons/io5';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { textState } from '../recoil/atom';
+import { isLoadingOcrState, textState } from '../recoil/atom';
 import { dataURItoBlob } from '../util/dataURItoBlob';
 
 const ImageUpload = () => {
@@ -18,6 +18,7 @@ const ImageUpload = () => {
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const latestCropDataUrl = useRef<string>();
 
+  const [isLoadingOcr, setIsLoadingOcr] = useRecoilState(isLoadingOcrState);
   // const uploadedImageRef = useRef<HTMLCanvasElement>(null);
 
   const [croppedImageDataUrlList, setCroppedImageDataUrlList] = useState<
@@ -85,6 +86,8 @@ const ImageUpload = () => {
   // ));
 
   const handleSendToServer = async () => {
+    setIsLoadingOcr(true);
+
     const result = await Promise.all(
       croppedImageDataUrlList.map(async (dataUrl) => {
         const params = new FormData();
@@ -112,6 +115,7 @@ const ImageUpload = () => {
         }
       })
     );
+    setIsLoadingOcr(false);
     setTextState((pre) => [...pre, ...(result as string[][][][]).flat()]);
   };
 
@@ -275,8 +279,9 @@ const ImageUpload = () => {
           crop={crop as any}
           onChange={(c) => setCrop(c as any)}
           onComplete={(c) => setCompletedCrop(c as any)}
-          className="max-w-screen-md"
+          className="max-w-screen-md max-h-screen"
         />
+        <style>{'.ReactCrop__image { max-height: 80vh; }'}</style>
       </div>
       {/* <button onClick={handleCapturePhoto}> 사진 촬영</button> */}
       <div className="overflow-scroll w-screen">
