@@ -1,0 +1,70 @@
+
+
+.ord-nw {
+  top: 0;
+  left: 0;
+  margin-top: -30px;
+  margin-left: -31px;
+  cursor: nw-resize;
+
+}
+.ord-n {
+  top: 0;
+  left: 50%;
+  margin-top: -30px;
+  margin-left: -31px;
+  cursor: n-resize;
+
+
+}
+.ord-ne {
+  top: 0;
+  right: 0;
+  margin-top: -30px;
+  margin-right: -31px;
+  cursor: ne-resize;
+
+
+}
+.ord-e {
+  top: 50%;
+  right: 0;
+  margin-top: -30px;
+  margin-right: -31px;
+  cursor: e-resize;
+
+}
+.ord-se {
+  bottom: 0;
+  right: 0;
+  margin-bottom: -30px;
+  margin-right: -31px;
+  cursor: se-resize;
+
+
+}
+.ord-s {
+  bottom: 0;
+  left: 50%;
+  margin-bottom: -30px;
+  margin-left: -31px;
+  cursor: s-resize;
+
+
+}
+.ord-sw {
+  bottom: 0;
+  left: 0;
+  margin-bottom: -30px;
+  margin-left: -31px;
+  cursor: sw-resize;
+
+
+}
+.ord-w {
+  top: 50%;
+  left: 0;
+  margin-top: -30px;
+  margin-left: -31px;
+  cursor: w-resize;
+}

@@ -1,6 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
-import 'react-image-crop/dist/ReactCrop.css';
+import React, { useRef, useState } from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { isLoadingOcrState, textState } from '../recoil/atom';
 import { dataURItoBlob } from '../util/dataURItoBlob';
@@ -16,7 +15,7 @@ const ImageUpload = () => {
   );
   const [uploadedImage, setUploadedImage] = useState<Object | null>(null);
   const cropTargetImageRef = useRef<HTMLImageElement>();
-  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+  // const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const latestCropDataUrl = useRef<string>();
 
   const [isLoadingOcr, setIsLoadingOcr] = useRecoilState(isLoadingOcrState);
@@ -104,10 +103,56 @@ const ImageUpload = () => {
   //   }
   // };
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (
+  //     !completedCrop ||
+  //     // !previewCanvasRef.current ||
+  //     !cropTargetImageRef.current
+  //   ) {
+  //     return;
+  //   }
+
+  //   const image = cropTargetImageRef.current;
+  //   // const canvas = previewCanvasRef.current;
+  //   const canvas = document.createElement('canvas');
+  //   const crop = completedCrop;
+
+  //   const scaleX = image.naturalWidth / image.width;
+  //   const scaleY = image.naturalHeight / image.height;
+  //   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+  //   // 하나의 CSS 픽셀을 그릴 때 사용해야 하는 장치 픽셀의 수
+  //   //  레티나 디스플레이에서 추가 픽셀 밀접도로 해상도를 올릴 수 있다.
+  //   const pixelRatio = window.devicePixelRatio;
+
+  //   canvas.width = crop.width * pixelRatio * scaleX;
+  //   canvas.height = crop.height * pixelRatio * scaleY;
+
+  //   ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+  //   ctx.imageSmoothingQuality = 'high';
+
+  //   ctx.drawImage(
+  //     image,
+  //     crop.x * scaleX,
+  //     crop.y * scaleY,
+  //     crop.width * scaleX,
+  //     crop.height * scaleY,
+  //     0,
+  //     0,
+  //     crop.width * scaleX,
+  //     crop.height * scaleY
+  //   );
+
+  //   latestCropDataUrl.current = canvas.toDataURL('image/png');
+  // }, [completedCrop]);
+
+  const handleDivideRadio = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDivideCount(e.target.value);
+  };
+
+  const handleConfirmCrop = () => {
     if (
       !completedCrop ||
-      !previewCanvasRef.current ||
+      // !previewCanvasRef.current ||
       !cropTargetImageRef.current
     ) {
       return;
@@ -143,17 +188,11 @@ const ImageUpload = () => {
       crop.height * scaleY
     );
 
-    latestCropDataUrl.current = canvas.toDataURL('image/png');
-  }, [completedCrop]);
+    // latestCropDataUrl.current = canvas.toDataURL('image/png');
 
-  const handleDivideRadio = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDivideCount(e.target.value);
-  };
-
-  const handleConfirmCrop = () => {
     setCroppedImageDataUrlList((pre) => [
       ...pre,
-      latestCropDataUrl.current as string,
+      canvas.toDataURL('image/png') as string,
     ]);
   };
 
@@ -246,10 +285,10 @@ const ImageUpload = () => {
           </button>
         </div>
       )}
-      <canvas
+      {/* <canvas
         ref={previewCanvasRef}
         // Rounding is important so the canvas width and height matches/is a multiple for sharpness.
-      />
+      /> */}
       <div
         onChange={handleDivideRadio}
         className="flex justify-start my-6 gap-4  "
