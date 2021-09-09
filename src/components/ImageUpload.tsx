@@ -1,17 +1,16 @@
-import { useThrottle } from '@react-hook/throttle';
 import axios from 'axios';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import ReactCrop from 'react-image-crop';
+import React, { useEffect, useRef, useState } from 'react';
 import 'react-image-crop/dist/ReactCrop.css';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { isLoadingOcrState, textState } from '../recoil/atom';
 import { dataURItoBlob } from '../util/dataURItoBlob';
 import rotateDataUrlOfImage from '../util/rotateImage';
+import CropZone from './uploadPart/CropZone';
 import ImageInputZone from './uploadPart/ImageInputZone';
 
 const ImageUpload = () => {
   // const [crop, setCrop] = useState({ unit: '%' });
-  const [crop, setCrop] = useThrottle({ unit: '%' }, 20);
+
   const [completedCrop, setCompletedCrop] = useState<HTMLImageElement | null>(
     null
   );
@@ -31,10 +30,6 @@ const ImageUpload = () => {
   const setTextState = useSetRecoilState(textState);
 
   const [text, setText] = useRecoilState(textState);
-
-  const onLoad = useCallback((img: HTMLImageElement) => {
-    cropTargetImageRef.current = img;
-  }, []);
 
   // const files = acceptedFiles.map((file) => (
   //   <li key={file.name}>
@@ -162,9 +157,10 @@ const ImageUpload = () => {
     ]);
   };
 
-  const handleResetCrop = () => {
-    setCrop({ unit: '%' });
-  };
+  // !! crop
+  // const handleResetCrop = () => {
+  //   setCrop({ unit: '%' });
+  // };
 
   const handleDeleteCrop = (e: any) => {
     setCroppedImageDataUrlList((pre) => {
@@ -194,18 +190,12 @@ const ImageUpload = () => {
   return (
     <section className="w-full flex flex-col items-center">
       <ImageInputZone setUploadedImage={setUploadedImage} />
+      <CropZone
+        cropTargetImageRef={cropTargetImageRef}
+        uploadedImage={uploadedImage}
+        setCompletedCrop={setCompletedCrop}
+      />
 
-      <div>
-        <ReactCrop
-          src={uploadedImage as string} // 크롭할 이미지 데이터
-          onImageLoaded={onLoad}
-          crop={crop as any}
-          onChange={(c) => setCrop(c as any)}
-          onComplete={(c) => setCompletedCrop(c as any)}
-          className="max-w-screen-md max-h-screen"
-        />
-        <style>{'.ReactCrop__image { max-height: 80vh; }'}</style>
-      </div>
       {/* <button onClick={handleCapturePhoto}> 사진 촬영</button> */}
       <div className="overflow-scroll w-screen">
         <div
@@ -241,9 +231,7 @@ const ImageUpload = () => {
           >
             자르기
           </button>
-          <button onClick={handleResetCrop} className="bg-mint text-white p-2">
-            자르기 리셋
-          </button>
+          <button className="bg-mint text-white p-2">자르기 리셋</button>
           <button
             onClick={handleSendToServer}
             className="bg-mint text-white p-2"
