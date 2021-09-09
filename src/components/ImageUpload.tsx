@@ -1,3 +1,4 @@
+import { useThrottle } from '@react-hook/throttle';
 import axios from 'axios';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -8,9 +9,9 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import { isLoadingOcrState, textState } from '../recoil/atom';
 import { dataURItoBlob } from '../util/dataURItoBlob';
 import rotateDataUrlOfImage from '../util/rotateImage';
-
 const ImageUpload = () => {
-  const [crop, setCrop] = useState({ unit: '%' });
+  // const [crop, setCrop] = useState({ unit: '%' });
+  const [crop, setCrop] = useThrottle({ unit: '%' }, 20);
   const [completedCrop, setCompletedCrop] = useState<HTMLImageElement | null>(
     null
   );
@@ -28,10 +29,7 @@ const ImageUpload = () => {
 
   const [divideCount, setDivideCount] = useState('1');
   const setTextState = useSetRecoilState(textState);
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log(e);
-  };
+
   const [text, setText] = useRecoilState(textState);
 
   const onLoad = useCallback((img: HTMLImageElement) => {
@@ -87,13 +85,11 @@ const ImageUpload = () => {
   // ));
 
   const handleSendToServer = async () => {
-    console.log('send to server now');
     setIsLoadingOcr(true);
 
     const result = await Promise.all(
       croppedImageDataUrlList.map(async (dataUrl) => {
         const params = new FormData();
-        console.log(dataURItoBlob(dataUrl));
         params.append('image', dataURItoBlob(dataUrl));
         params.append('divide', divideCount);
         try {
@@ -111,7 +107,7 @@ const ImageUpload = () => {
 
           return result.data;
         } catch (error) {
-          console.log(error);
+          console.error(error);
           alert(error);
           throw new Error('error');
         }
@@ -123,8 +119,6 @@ const ImageUpload = () => {
       .finally(() => {
         setIsLoadingOcr(false);
       });
-    console.log('promise all result');
-    console.log(result);
 
     if (!result) return;
 
@@ -149,16 +143,12 @@ const ImageUpload = () => {
             withCredentials: true,
           }
         );
-        console.log(result);
         setTextState(result.data);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         alert(error);
       }
     }
-
-    console.log(e);
-    console.log(uploadedImage);
   };
 
   useEffect(() => {
@@ -219,7 +209,6 @@ const ImageUpload = () => {
   };
 
   const handleDeleteCrop = (e: any) => {
-    console.log(e);
     setCroppedImageDataUrlList((pre) => {
       const temp = [...pre];
       temp.splice(parseInt(e.target.dataset.idx), 1);
@@ -248,8 +237,6 @@ const ImageUpload = () => {
     );
     cropTargetImageRef.current?.setAttribute('src', newDataUrl);
   };
-
-  console.log();
 
   return (
     <section className="w-full flex flex-col items-center">

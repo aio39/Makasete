@@ -5,6 +5,7 @@
   "dependencies": {
     "@craco/craco": "^6.2.0",
     "@google-cloud/vision": "^2.3.8",
+    "@react-hook/throttle": "^2.2.0",
     "@tailwindcss/forms": "^0.3.3",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",

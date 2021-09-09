@@ -15,7 +15,6 @@ import {
   wordListLength,
 } from './recoil/atom';
 
-
 function App() {
   const isExist = useRecoilValue(wordListLength);
   const isNowEditing = useRecoilValue(isNowEditingState);
@@ -30,18 +29,17 @@ function App() {
   // });
   useEffect(() => {
     if (!window.localStorage) return;
-    const browserPrefersColorScheme = window.matchMedia(
-      '(prefers-color-scheme: dark)'
-    )?.matches as boolean;
     const setLocalDarkSetting = window.localStorage.getItem('isDarkMode');
-
     // 로컬스토리지 설정을 우선시하고 없을 경우 브라우저 설정
     if (setLocalDarkSetting !== null) {
       setIsDarkMode(setLocalDarkSetting === 'true');
     } else {
+      const browserPrefersColorScheme = window.matchMedia(
+        '(prefers-color-scheme: dark)'
+      )?.matches as boolean;
       setIsDarkMode(browserPrefersColorScheme);
     }
-  }, []);
+  }, [isDarkMode]);
 
   return (
     <div
