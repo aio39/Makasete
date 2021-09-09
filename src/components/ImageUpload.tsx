@@ -192,7 +192,7 @@ const ImageUpload = () => {
 
     setCroppedImageDataUrlList((pre) => [
       ...pre,
-      canvas.toDataURL('image/png') as string,
+      canvas.toDataURL('image/jpeg', 0.7) as string,
     ]);
   };
 
