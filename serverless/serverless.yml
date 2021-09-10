@@ -15,7 +15,7 @@ provider:
   environment:
     D2_ID: ${env:D2_ID}
     D2_SECRET: ${env:D2_SECRET}
-    
+    HOST: ${env:HOST}
 
 
 plugins:
