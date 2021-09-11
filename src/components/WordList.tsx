@@ -1,13 +1,13 @@
 import { FC } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { textState } from '../recoil/atom';
 
 const WordList: FC<any> = () => {
-  const [text, setText] = useRecoilState(textState);
+  const text = useRecoilValue(textState);
   return (
     <div className="min-w-full flex flex-wrap">
       {text.map((list, idxA) => (
-        <div id={'list' + (idxA + 1)} className="w-full flex-grow mb-6">
+        <div key={'list' + (idxA + 1)} className="w-full flex-grow mb-6">
           <h2 className="text-2xl text font-semibold my-2">
             リスト {idxA + 1}
           </h2>

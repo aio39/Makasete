@@ -15,11 +15,14 @@ const CropZone: FC<ICropZone> = ({
   uploadedImage,
   setCompletedCrop,
 }) => {
-  const [crop, setCrop] = useThrottle({ unit: '%' }, 20);
+  const [crop, setCrop] = useThrottle({ unit: '%' }, 60);
 
-  const onLoad = useCallback((img: HTMLImageElement) => {
-    cropTargetImageRef.current = img;
-  }, []);
+  const onLoad = useCallback(
+    (img: HTMLImageElement) => {
+      cropTargetImageRef.current = img;
+    },
+    [cropTargetImageRef]
+  );
 
   return (
     <div>

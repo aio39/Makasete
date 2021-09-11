@@ -8,7 +8,6 @@ import WordList from './components/WordList';
 import WordListNav from './components/WordListNav';
 // import './App.css';
 import './index.css';
-import worker_script from './pwa/test';
 import {
   isDarkModeState,
   isLoadingOcrState,
@@ -22,12 +21,6 @@ function App() {
   const isLoadingOcr = useRecoilValue(isLoadingOcrState);
   const [isDarkMode, setIsDarkMode] = useRecoilState(isDarkModeState);
 
-  const worker = new Worker(worker_script);
-  worker.onmessage = (m) => {
-    console.log('msg from worker: ', m.data);
-  };
-  worker.postMessage('hello');
-
   useEffect(() => {
     if (!window.localStorage) return;
     const setLocalDarkSetting = window.localStorage.getItem('isDarkMode');
@@ -40,7 +33,7 @@ function App() {
       )?.matches as boolean;
       setIsDarkMode(browserPrefersColorScheme);
     }
-  }, [isDarkMode]);
+  }, [isDarkMode, setIsDarkMode]);
 
   return (
     <div

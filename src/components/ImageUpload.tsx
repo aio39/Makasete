@@ -1,23 +1,28 @@
 import axios from 'axios';
-import React, { useCallback, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Crop } from 'react-image-crop';
 import { useSetRecoilState } from 'recoil';
+import imageToJpegDataUrlWorker from '../pwa/ImageToJpegDataUrl';
 import { isLoadingOcrState, textState } from '../recoil/atom';
-import { dataURItoBlob } from '../util/dataURItoBlob';
 import rotateDataUrlOfImage from '../util/rotateImage';
 import CropZone from './uploadPart/CropZone';
 import ImageInputZone from './uploadPart/ImageInputZone';
 
 const ImageUpload = () => {
-  // const worker = useMemo(() => {
-  //   const worker = new Worker(imageToJpegDataUrlWorker);
-  //   worker.onmessage = (m) => {
-  //     console.log('msg from worker: ', m.data);
-  //   };
-  //   return worker;
-  // }, []);
-  const [completedCrop, setCompletedCrop] = useState<HTMLImageElement | null>(
-    null
-  );
+  const worker = useMemo(() => {
+    const worker = new Worker(imageToJpegDataUrlWorker);
+    worker.onmessage = (m) => {
+      setCroppedImageDataUrlList((pre) => [...pre, m.data]);
+    };
+    return worker;
+  }, []);
+  const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
   const [uploadedImage, setUploadedImage] = useState<Object | null>(null);
   const cropTargetImageRef = useRef<HTMLImageElement>();
 
@@ -29,13 +34,29 @@ const ImageUpload = () => {
 
   const setTextState = useSetRecoilState(textState);
 
+  useEffect(() => {
+    return () => {
+      worker.terminate();
+    };
+  }, [worker]);
+
+  const setWorkerImage = useCallback(
+    (imageUrl) => {
+      worker.postMessage({ imageUrl });
+    },
+    [worker]
+  );
+
   const handleSendToServer = useCallback(async () => {
     setIsLoadingOcr(true);
 
     const result = await Promise.all(
       croppedImageDataUrlList.map(async (dataUrl) => {
         const params = new FormData();
-        params.append('image', dataURItoBlob(dataUrl));
+        console.time('fetch');
+        const blob = await fetch(dataUrl).then((r) => r.blob());
+        console.timeEnd('fetch');
+        params.append('image', blob);
         try {
           const result = await axios.post<string[][]>(
             process.env.REACT_APP_OCR_URL as string,
@@ -74,54 +95,58 @@ const ImageUpload = () => {
   ]);
 
   const handleConfirmCrop = useCallback(() => {
-    if (
-      !completedCrop ||
-      // !previewCanvasRef.current ||
-      !cropTargetImageRef.current
-    ) {
+    if (!completedCrop || !cropTargetImageRef.current) {
       return;
     }
 
     const image = cropTargetImageRef.current;
-    const canvas = document.createElement('canvas');
+    // const canvas = document.createElement('canvas') as any;
     const crop = completedCrop;
 
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-
+    // const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     // 하나의 CSS 픽셀을 그릴 때 사용해야 하는 장치 픽셀의 수
     //  레티나 디스플레이에서 추가 픽셀 밀접도로 해상도를 올릴 수 있다.
     const pixelRatio = window.devicePixelRatio;
 
-    canvas.width = crop.width * pixelRatio * scaleX;
-    canvas.height = crop.height * pixelRatio * scaleY;
+    // canvas.width = crop.width * pixelRatio * scaleX;
+    // canvas.height = crop.height * pixelRatio * scaleY;
 
-    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    ctx.imageSmoothingQuality = 'high';
+    // ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    // ctx.imageSmoothingQuality = 'high';
 
-    ctx.drawImage(
-      image,
-      crop.x * scaleX,
-      crop.y * scaleY,
-      crop.width * scaleX,
-      crop.height * scaleY,
-      0,
-      0,
-      crop.width * scaleX,
-      crop.height * scaleY
-    );
+    // ctx.drawImage(
+    //   image,
+    //   crop.x * scaleX,
+    //   crop.y * scaleY,
+    //   crop.width * scaleX,
+    //   crop.height * scaleY,
+    //   0,
+    //   0,
+    //   crop.width * scaleX,
+    //   crop.height * scaleY
+    // );
 
-    setCroppedImageDataUrlList((pre) => [
-      ...pre,
-      canvas.toDataURL('image/jpeg', 0.7) as string,
-    ]);
-  }, [completedCrop]);
+    const drawData = {
+      crop,
+      scaleX,
+      scaleY,
+      pixelRatio,
+    };
+
+    worker.postMessage({ drawData });
+    // setCroppedImageDataUrlList((pre) => [
+    //   ...pre,
+    //   canvas.toDataURL('image/jpeg', 0.7) as string,
+    // ]);
+  }, [completedCrop, worker]);
 
   const handleDeleteCrop = (e: any) => {
     setCroppedImageDataUrlList((pre) => {
       const temp = [...pre];
-      temp.splice(parseInt(e.target.dataset.idx), 1);
+      const [deletedObjectUrl] = temp.splice(parseInt(e.target.dataset.idx), 1);
+      URL.revokeObjectURL(deletedObjectUrl);
       return temp;
     });
   };
@@ -131,11 +156,15 @@ const ImageUpload = () => {
       cropTargetImageRef.current?.getAttribute('src') as string
     );
     cropTargetImageRef.current?.setAttribute('src', newDataUrl);
+    worker.postMessage({ imageUrl: newDataUrl });
   };
 
   return (
     <section className="w-full flex flex-col items-center">
-      <ImageInputZone setUploadedImage={setUploadedImage} />
+      <ImageInputZone
+        setUploadedImage={setUploadedImage}
+        setWorkerImage={setWorkerImage}
+      />
       <CropZone
         cropTargetImageRef={cropTargetImageRef}
         uploadedImage={uploadedImage}
