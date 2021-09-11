@@ -37,7 +37,7 @@ const ImageUpload = () => {
         const params = new FormData();
         params.append('image', dataURItoBlob(dataUrl));
         try {
-          const result = await axios.post<string[][][]>(
+          const result = await axios.post<string[][]>(
             process.env.REACT_APP_OCR_URL as string,
             params,
             {
@@ -64,9 +64,14 @@ const ImageUpload = () => {
       });
 
     if (!result) return;
-
-    setTextState((pre) => [...pre, ...(result as string[][][][]).flat()]);
-  }, [setIsLoadingOcr, croppedImageDataUrlList, setTextState]);
+    setCroppedImageDataUrlList(() => []);
+    setTextState((pre) => [...pre, ...(result as string[][][])]);
+  }, [
+    setIsLoadingOcr,
+    croppedImageDataUrlList,
+    setTextState,
+    setCroppedImageDataUrlList,
+  ]);
 
   const handleConfirmCrop = useCallback(() => {
     if (
