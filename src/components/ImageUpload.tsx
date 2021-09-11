@@ -4,12 +4,12 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from 'react';
 import { Crop } from 'react-image-crop';
 import { useSetRecoilState } from 'recoil';
 import imageToJpegDataUrlWorker from '../pwa/ImageToJpegDataUrl';
-import { isLoadingOcrState, textState } from '../recoil/atom';
+import { cropState, isLoadingOcrState, textState } from '../recoil/atom';
 import { dataURItoBlob } from '../util/dataURItoBlob';
 import rotateDataUrlOfImage from '../util/rotateImage';
 import CropZone from './uploadPart/CropZone';
@@ -24,17 +24,16 @@ const ImageUpload = () => {
     };
     return worker;
   }, []);
+  const cropTargetImageRef = useRef<HTMLImageElement>();
   const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
   const [uploadedImage, setUploadedImage] = useState<Object | null>(null);
-  const cropTargetImageRef = useRef<HTMLImageElement>();
-
-  const setIsLoadingOcr = useSetRecoilState(isLoadingOcrState);
-
   const [croppedImageDataUrlList, setCroppedImageDataUrlList] = useState<
     string[]
   >([]);
 
+  const setIsLoadingOcr = useSetRecoilState(isLoadingOcrState);
   const setTextState = useSetRecoilState(textState);
+  const setCrop = useSetRecoilState(cropState);
 
   useEffect(() => {
     return () => {
@@ -50,8 +49,11 @@ const ImageUpload = () => {
   );
 
   const handleSendToServer = useCallback(async () => {
+    if (croppedImageDataUrlList.length === 0) {
+      alert('크롭된 이미지가 없습니다.');
+      return;
+    }
     setIsLoadingOcr(true);
-
     const result = await Promise.all(
       croppedImageDataUrlList.map(async (dataOrObjectUrl) => {
         const params = new FormData();
@@ -102,17 +104,22 @@ const ImageUpload = () => {
   ]);
 
   const handleConfirmCrop = useCallback(() => {
-    if (!completedCrop || !cropTargetImageRef.current) {
-      return;
-    }
+    if (!cropTargetImageRef.current) return;
 
     const image = cropTargetImageRef.current;
-    // const canvas = document.createElement('canvas') as any;
-    const crop = completedCrop;
+    const crop: Crop =
+      completedCrop && completedCrop.width !== 0 // 이미지 업로드시 0 0으로 설정됨
+        ? completedCrop
+        : {
+            unit: 'px',
+            x: 0,
+            y: 0,
+            width: image.width,
+            height: image.height,
+          };
 
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
-    // const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     // 하나의 CSS 픽셀을 그릴 때 사용해야 하는 장치 픽셀의 수
     //  레티나 디스플레이에서 추가 픽셀 밀접도로 해상도를 올릴 수 있다.
     const pixelRatio = window.devicePixelRatio;
@@ -170,6 +177,11 @@ const ImageUpload = () => {
     worker?.postMessage({ imageUrl: newDataUrl });
   };
 
+  const handleResetCrop = () => {
+    setCrop(null);
+    setCompletedCrop(null);
+  };
+
   return (
     <section className="w-full flex flex-col items-center">
       <ImageInputZone
@@ -216,7 +228,9 @@ const ImageUpload = () => {
           >
             자르기
           </button>
-          <button className="bg-mint text-white p-2">자르기 리셋</button>
+          <button onClick={handleResetCrop} className="bg-mint text-white p-2">
+            자르기 리셋
+          </button>
           <button
             onClick={handleSendToServer}
             className="bg-mint text-white p-2"

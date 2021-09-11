@@ -23,6 +23,7 @@ const workerCode = () => {
       });
     }
     if (e.data.drawData) {
+      console.info('service worker is Cropping Image');
       const { crop, scaleX, scaleY, pixelRatio } = e.data.drawData;
       offscreen.width = crop.width * pixelRatio * scaleX;
       offscreen.height = crop.height * pixelRatio * scaleY;

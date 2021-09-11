@@ -1,7 +1,9 @@
-import { useThrottle } from '@react-hook/throttle';
+import { useThrottleCallback } from '@react-hook/throttle';
 import React, { FC, memo, useCallback } from 'react';
-import ReactCrop from 'react-image-crop';
+import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import { useRecoilState } from 'recoil';
+import { cropState } from '../../recoil/atom';
 import './overwriteCropStyle.css';
 
 interface ICropZone {
@@ -15,7 +17,12 @@ const CropZone: FC<ICropZone> = ({
   uploadedImage,
   setCompletedCrop,
 }) => {
-  const [crop, setCrop] = useThrottle({ unit: '%' }, 60);
+  const [crop, setCrop] = useRecoilState(cropState);
+
+  const throttleSetCrop = useThrottleCallback((c: Crop) => {
+    setCrop(c);
+  }, 60);
+  // const [crop, setCrop] = useThrottle({ unit: '%' }, 60);
 
   const onLoad = useCallback(
     (img: HTMLImageElement) => {
@@ -30,7 +37,7 @@ const CropZone: FC<ICropZone> = ({
         src={uploadedImage as string} // 크롭할 이미지 데이터
         onImageLoaded={onLoad}
         crop={crop as any}
-        onChange={(c) => setCrop(c as any)}
+        onChange={throttleSetCrop}
         onComplete={(c) => setCompletedCrop(c as any)}
         className="max-w-screen-md max-h-screen"
         onImageError={() => {
