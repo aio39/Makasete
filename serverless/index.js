@@ -19,7 +19,8 @@ const os = require('os');
 const fs = require('fs');
 
 const { Translate } = require('@google-cloud/translate').v2;
-const translate = async (textList) => {
+const { runKuromoji } = require('./kuromiji');
+const translateByGCP = async (textList) => {
   const translate = new Translate({
     projectId: process.env.GCP_PROJECT || 'makasete',
   });
@@ -31,6 +32,13 @@ const translate = async (textList) => {
   const [translation] = await translate.translate(textList, option);
   return translation;
 };
+
+const kanaToHira = (text) => {
+   return text.replace(/[\u30a1-\u30f6]/g, function (match) {
+     const chr = match.charCodeAt(0) - 0x60;
+     return String.fromCharCode(chr);
+   });
+}
 
 exports.ocr = (req, res) => {
   // NOTE  localhost:3000 설정.
@@ -45,21 +53,28 @@ exports.ocr = (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).end();
   }
-  const busboy = new Busboy({ headers: req.headers });
 
-  const fields = {};
+  const MODE = 'mode';
+  const IMAGE = 'image';
+
+  let mode = 0; // 0 단어, 1 문장
+  let imageData;
+
+  //  const fields = {};
   const uploads = {};
-  // not File 필드 string 값
-  busboy.on('field', (fieldname, val, a, b, c, d) => {
-    fields[fieldname] = val;
+  const result = [];
+   const fileWritePromises = [];
+
+  const busboy = new Busboy({ headers: req.headers });
+  // not File 필드 값들을 string으로 배열에 넣음.
+  busboy.on('field', (fieldName, val, a, b, c, d) => {
+    if (fieldName === MODE && val === '1' ) mode = 1 
   });
 
   const tmpdir = os.tmpdir();
-  const fileWritePromises = [];
-  let imageData;
-  busboy.on('file', (fieldname, file, filename) => {
-    const filepath = path.join(tmpdir, filename); // 메모리상 dir
-    uploads[fieldname] = filepath;
+  busboy.on('file', (fieldName, file, fileName) => {
+    const filepath = path.join(tmpdir, fileName); // 메모리상 dir
+    uploads[fieldName] = filepath;
     const writeStream = fs.createWriteStream(filepath);
     file.pipe(writeStream);
 
@@ -76,18 +91,14 @@ exports.ocr = (req, res) => {
     fileWritePromises.push(promise);
   });
 
-  // Triggered once all uploaded files are processed by Busboy.
-  // We still need to wait for the disk writes (saves) to complete.
-  const result = [];
   busboy.on('finish', async () => {
     for (const file in uploads) {
       fs.unlinkSync(uploads[file]);
     }
 
     await Promise.all(fileWritePromises);
-    /**
-     * TODO(developer): Process saved files here
-     */
+
+
     const client = new vision.ImageAnnotatorClient();
     const detectedText = await client
       .textDetection({
@@ -101,51 +112,92 @@ exports.ocr = (req, res) => {
       .finally(() => {
         imageData = null;
       });
+    
     const rawText = detectedText[0].fullTextAnnotation.text;
-    const kanjiText = rawText
-      .replace(/[\w)(|]/gi, '') // 특수 문자 제거
-      .replace(/\n/g, ' ') // 줄바꿈 제거
-      .replace(/ +(?= )/g, '') // 2칸 이상 공백 제거
-      .trim(); // 좌우 공백 제거
 
-    const delimiter = '*';
-    const kanjiTextList = kanjiText.split(' ');
+    if (mode === 0) {
+      const kanjiText = rawText
+        .replace(/[\w)(|]/gi, '') // 특수 문자 제거
+        .replace(/\n/g, ' ') // 줄바꿈 제거
+        .replace(/ +(?= )/g, '') // 2칸 이상 공백 제거
+        .trim(); // 좌우 공백 제거
 
-    const [
-      {
-        data: { converted: hiraganaText },
-      },
-      hangulTextList,
-    ] = await Promise.all([
-      axios
-        .post('https://labs.goo.ne.jp/api/hiragana', {
-          app_id:
-            '5f82101255bc786575ef667938d33a5f8afccc2e54aa4638dd81230aa06c26e8',
-          sentence: kanjiText.replace(/( * )/g, delimiter),
-          output_type: 'hiragana',
-        })
-        .catch((err) => {
-          console.log(err);
-        }),
-      translate(kanjiText.replace(/ /g, '。 ').split(' ')),
-    ]);
+      const delimiter = '*';
+      const kanjiTextList = kanjiText.split(' ');
 
-    const hiraganaTextList = hiraganaText
-      .replace(/( * )+/g, '')
-      .split(delimiter);
+      const [
+        {
+          data: { converted: hiraganaText },
+        },
+        hangulTextList,
+      ] = await Promise.all([
+        axios
+          .post('https://labs.goo.ne.jp/api/hiragana', {
+            app_id:
+              '5f82101255bc786575ef667938d33a5f8afccc2e54aa4638dd81230aa06c26e8',
+            sentence: kanjiText.replace(/( * )/g, delimiter),
+            output_type: 'hiragana',
+          })
+          .catch((err) => {
+            console.log(err);
+          }),
+        translateByGCP(kanjiText.replace(/ /g, '。 ').split(' ')),
+      ]);
 
-    Array(kanjiTextList.length)
-      .fill()
-      .forEach((_, idx) => {
-        result.push([
-          kanjiTextList[idx],
-          hiraganaTextList[idx],
-          ...(hangulTextList ? [hangulTextList[idx].slice(0, -1)] : []),
-        ]);
+      const hiraganaTextList = hiraganaText
+        .replace(/( * )+/g, '')
+        .split(delimiter);
+
+      Array(kanjiTextList.length)
+        .fill()
+        .forEach((_, idx) => {
+          result.push([
+            kanjiTextList[idx],
+            hiraganaTextList[idx],
+            ...(hangulTextList ? [hangulTextList[idx].slice(0, -1)] : []),
+          ]);
+        });
+      console.log(memoryUsage());
+      res.send(result);
+    } else {
+      const posList = {
+        名詞: '名詞', //
+        動詞: '動詞', //
+        副詞: '副詞', //
+        助動詞: '助動詞', // た　ない　な
+        接続詞: '接続詞', // すなわち
+        助詞: '助詞', //  の　と　は
+        記号: '記号', // 공백 ， ） 。
+      };
+      const kuroResult =  await  runKuromoji({text: rawText.replace(/\n/g, ' ')})
+       const hiraganaTextList = []
+       const kanjiTextList = [];
+     kuroResult.forEach((curr) => {
+        const { pos, basic_form, reading, conjugated_form, conjugated_type } =
+          curr;
+        if ([posList.記号, posList.助動詞, posList.助詞].includes(pos)) return 
+        if (basic_form === '*') return 
+        if (['連用形'].includes(conjugated_form) && ['サ変・スル'].includes(conjugated_type)) return; // ~시 필터링
+        if (['せる','すぎる', 'みる', 'いる','れる','られる','できる','くれる', 'ささげる','わけ','こと','もの','こと','なら'].includes(basic_form)) return;
+        hiraganaTextList.push(kanaToHira(reading));
+        kanjiTextList.push(basic_form);
       });
-    console.log(memoryUsage());
-    res.send(result);
-  });
 
+
+      const hangulTextList = await translateByGCP(kanjiTextList);
+
+      Array(kanjiTextList.length)
+        .fill()
+        .forEach((_, idx) => {
+          result.push([
+            kanjiTextList[idx],
+            hiraganaTextList[idx],
+            ...(hangulTextList ? [hangulTextList[idx]] : []),
+          ]);
+        });
+        console.log(memoryUsage());
+      res.send(result);
+    }
+  });
   busboy.end(req.rawBody);
-};
+};;
