@@ -1,18 +1,50 @@
-import { FC } from 'react';
+import axios from 'axios';
+import { FC, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { textState } from '../recoil/atom';
 
 const WordList: FC<any> = () => {
   const text = useRecoilValue(textState);
+  const [html, setHtml] = useState<string>('');
+
+  const handleShowDict: React.MouseEventHandler<HTMLElement> = async (e) => {
+    if (e.target instanceof HTMLButtonElement) {
+      const word = e.target.value;
+
+      const resultHtml = await axios
+        .get(`${process.env.REACT_APP_OCR_URL}?word=${word} `, {
+          headers: {},
+          withCredentials: true,
+        })
+        .catch((e) => {
+          alert(e);
+        });
+      if (resultHtml) {
+        console.log(resultHtml.data);
+        setHtml(resultHtml.data);
+      }
+    }
+  };
+
+  function createMarkup() {
+    return { __html: html };
+  }
+
   return (
     <div className="min-w-full flex flex-wrap">
-      {text.map((list, idxA) => (
-        <div key={'list' + (idxA + 1)} className="w-full flex-grow mb-6">
+      {html !== '' && <div dangerouslySetInnerHTML={createMarkup()}></div>}
+
+      {text.map((list, listIdx) => (
+        <div
+          key={'list' + (listIdx + 1)}
+          className="w-full flex-grow mb-6"
+          onClick={handleShowDict}
+        >
           <h2 className="text-2xl text font-semibold my-2">
-            リスト {idxA + 1}
+            リスト {listIdx + 1}
           </h2>
-          {list.map((word, idxB) => (
-            <li key={`${word[0]}${idxA}${idxB}`} className="flex  py-2  ">
+          {list.map((word, wordIdx) => (
+            <li key={`${word[0]}${listIdx}${wordIdx}`} className="flex  py-2  ">
               {Array(3)
                 .fill('')
                 .map((_, idx) => (
@@ -23,7 +55,7 @@ const WordList: FC<any> = () => {
                     <span className=" ">{word[idx]}</span>
                   </div>
                 ))}
-              <div>V</div>
+              <button value={word[wordIdx]}>V</button>
             </li>
           ))}
         </div>
