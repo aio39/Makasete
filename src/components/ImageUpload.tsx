@@ -30,6 +30,7 @@ const ImageUpload = () => {
   const [croppedImageDataUrlList, setCroppedImageDataUrlList] = useState<
     string[]
   >([]);
+  const [ocrMode, setOcrMode] = useState('0');
 
   const setIsLoadingOcr = useSetRecoilState(isLoadingOcrState);
   const setTextState = useSetRecoilState(textState);
@@ -65,6 +66,7 @@ const ImageUpload = () => {
         } else {
           params.append('image', dataURItoBlob(dataOrObjectUrl));
         }
+        params.append('mode', ocrMode);
 
         try {
           const result = await axios.post<string[][]>(
@@ -101,6 +103,7 @@ const ImageUpload = () => {
     croppedImageDataUrlList,
     setTextState,
     setCroppedImageDataUrlList,
+    ocrMode,
   ]);
 
   const handleConfirmCrop = useCallback(() => {
@@ -182,6 +185,12 @@ const ImageUpload = () => {
     setCompletedCrop(null);
   };
 
+  const handleOCRMode: React.FormEventHandler<HTMLElement> = (e) => {
+    if (e.target instanceof HTMLInputElement) {
+      setOcrMode(e.target.value);
+    }
+  };
+
   return (
     <section className="w-full flex flex-col items-center">
       <ImageInputZone
@@ -243,6 +252,22 @@ const ImageUpload = () => {
           >
             사진 회전
           </button>
+          <div onChange={handleOCRMode}>
+            <input
+              type="radio"
+              value="0"
+              name="문장모드"
+              checked={ocrMode === '0'}
+            />{' '}
+            단어 리스트
+            <input
+              type="radio"
+              value="1"
+              name="gender"
+              checked={ocrMode === '1'}
+            />{' '}
+            문장
+          </div>
         </div>
       )}
     </section>

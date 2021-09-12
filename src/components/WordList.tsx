@@ -12,7 +12,7 @@ const WordList: FC<any> = () => {
       const word = e.target.value;
 
       const resultHtml = await axios
-        .get(`${process.env.REACT_APP_OCR_URL}?word=${word} `, {
+        .get(`${process.env.REACT_APP_DICT_URL}?word=${word} `, {
           headers: {},
           withCredentials: true,
         })
