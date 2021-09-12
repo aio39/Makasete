@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 const { memoryUsage } = require('process');
 
 exports.test = async (request, response) => {
@@ -20,6 +21,7 @@ const fs = require('fs');
 
 const { Translate } = require('@google-cloud/translate').v2;
 const { runKuromoji } = require('./kuromiji');
+const { usePuppeteer } = require('./crowlDict');
 const translateByGCP = async (textList) => {
   const translate = new Translate({
     projectId: process.env.GCP_PROJECT || 'makasete',
@@ -34,11 +36,11 @@ const translateByGCP = async (textList) => {
 };
 
 const kanaToHira = (text) => {
-   return text.replace(/[\u30a1-\u30f6]/g, function (match) {
-     const chr = match.charCodeAt(0) - 0x60;
-     return String.fromCharCode(chr);
-   });
-}
+  return text.replace(/[\u30a1-\u30f6]/g, function (match) {
+    const chr = match.charCodeAt(0) - 0x60;
+    return String.fromCharCode(chr);
+  });
+};
 
 exports.ocr = (req, res) => {
   // NOTE  localhost:3000 설정.
@@ -63,12 +65,12 @@ exports.ocr = (req, res) => {
   //  const fields = {};
   const uploads = {};
   const result = [];
-   const fileWritePromises = [];
+  const fileWritePromises = [];
 
   const busboy = new Busboy({ headers: req.headers });
   // not File 필드 값들을 string으로 배열에 넣음.
   busboy.on('field', (fieldName, val, a, b, c, d) => {
-    if (fieldName === MODE && val === '1' ) mode = 1 
+    if (fieldName === MODE && val === '1') mode = 1;
   });
 
   const tmpdir = os.tmpdir();
@@ -98,7 +100,6 @@ exports.ocr = (req, res) => {
 
     await Promise.all(fileWritePromises);
 
-
     const client = new vision.ImageAnnotatorClient();
     const detectedText = await client
       .textDetection({
@@ -112,7 +113,7 @@ exports.ocr = (req, res) => {
       .finally(() => {
         imageData = null;
       });
-    
+
     const rawText = detectedText[0].fullTextAnnotation.text;
 
     if (mode === 0) {
@@ -169,20 +170,43 @@ exports.ocr = (req, res) => {
         助詞: '助詞', //  の　と　は
         記号: '記号', // 공백 ， ） 。
       };
-      const kuroResult =  await  runKuromoji({text: rawText.replace(/\n/g, ' ')})
-       const hiraganaTextList = []
-       const kanjiTextList = [];
-     kuroResult.forEach((curr) => {
+      const kuroResult = await runKuromoji({
+        text: rawText.replace(/\n/g, ' '),
+      });
+      const hiraganaTextList = [];
+      const kanjiTextList = [];
+      kuroResult.forEach((curr) => {
         const { pos, basic_form, reading, conjugated_form, conjugated_type } =
           curr;
-        if ([posList.記号, posList.助動詞, posList.助詞].includes(pos)) return 
-        if (basic_form === '*') return 
-        if (['連用形'].includes(conjugated_form) && ['サ変・スル'].includes(conjugated_type)) return; // ~시 필터링
-        if (['せる','すぎる', 'みる', 'いる','れる','られる','できる','くれる', 'ささげる','わけ','こと','もの','こと','なら'].includes(basic_form)) return;
+        if ([posList.記号, posList.助動詞, posList.助詞].includes(pos)) return;
+        if (basic_form === '*') return;
+        if (
+          ['連用形'].includes(conjugated_form) &&
+          ['サ変・スル'].includes(conjugated_type)
+        )
+          return; // ~시 필터링
+        if (
+          [
+            'せる',
+            'すぎる',
+            'みる',
+            'いる',
+            'れる',
+            'られる',
+            'できる',
+            'くれる',
+            'ささげる',
+            'わけ',
+            'こと',
+            'もの',
+            'こと',
+            'なら',
+          ].includes(basic_form)
+        )
+          return;
         hiraganaTextList.push(kanaToHira(reading));
         kanjiTextList.push(basic_form);
       });
-
 
       const hangulTextList = await translateByGCP(kanjiTextList);
 
@@ -195,9 +219,31 @@ exports.ocr = (req, res) => {
             ...(hangulTextList ? [hangulTextList[idx]] : []),
           ]);
         });
-        console.log(memoryUsage());
+      console.log(memoryUsage());
       res.send(result);
     }
   });
   busboy.end(req.rawBody);
-};;
+};
+
+exports.dict = (req, res) => {
+  res.set(
+    'Access-Control-Allow-Origin',
+    process.env.HOST || 'http://localhost:3000'
+  );
+  res.set('Access-Control-Allow-Credentials', 'true');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Authorization');
+  res.set('Access-Control-Max-Age', '3600');
+  if (req.method !== 'GET') {
+    return res.status(405).end();
+  }
+
+  usePuppeteer(req.query.word)
+    .then((r) => {
+      res.send(r);
+    })
+    .catch((e) => {
+      res.send(e);
+    });
+};

@@ -6,13 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "helloworld": "functions-framework --target=test",
-    "ocr": "cross-env-file -p ./.env.json functions-framework --target=ocr"
+    "ocr": "cross-env-file -p ./.env.json functions-framework --target=ocr",
+    "dict": "cross-env-file -p ./.env.json functions-framework --target=dict"
   },
   "author": "serverless.com",
   "license": "MIT",
   "devDependencies": {
     "@google-cloud/functions-framework": "^1.9.0",
     "@types/axios": "^0.14.0",
+    "@types/puppeteer": "^5.4.4",
     "cross-env": "^7.0.3",
     "cross-env-file": "^1.0.0",
     "serverless-google-cloudfunctions": "*",
@@ -25,6 +27,7 @@
     "axios": "^0.21.1",
     "busboy": "^0.3.1",
     "kuromoji": "^0.1.2",
+    "puppeteer": "^9.0.0",
     "sharp": "^0.29.0"
   }
 }

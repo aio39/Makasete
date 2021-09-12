@@ -43,6 +43,10 @@ functions:
     handler: ocr
     events:
       - http: ocr
+  dict:
+    handler: dict
+    events:
+      - http: dict
       
   # NOTE: the following uses an "event" event (pubSub event in this case).
   # Please create the corresponding resources in the Google Cloud
