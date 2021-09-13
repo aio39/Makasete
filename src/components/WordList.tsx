@@ -1,8 +1,9 @@
 import { FC, useState } from 'react';
 import { useModal } from 'react-hooks-use-modal';
 import Iframe from 'react-iframe';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { openDictModeState, textState } from '../recoil/atom';
+import removeOneItemFromArray from '../util/removeOneItemFromArray';
 // const handleShowDict: React.MouseEventHandler<HTMLElement> = async (e) => {
 //   if (e.target instanceof HTMLButtonElement) {
 //     const word = e.target.value;
@@ -25,7 +26,7 @@ import { openDictModeState, textState } from '../recoil/atom';
 const DICT_URL = 'https://ja.dict.naver.com/#/search?range=word&query=';
 
 const WordList: FC<any> = () => {
-  const wordListsData = useRecoilValue(textState);
+  const [wordListsData, setWordListsData] = useRecoilState(textState);
   const openDictMode = useRecoilValue(openDictModeState);
   const [selectedWord, setSelectedWord] = useState<string>();
   const [Modal, open, close, isOpen] = useModal('root', {
@@ -35,42 +36,59 @@ const WordList: FC<any> = () => {
 
   const handleShowDict: React.MouseEventHandler<HTMLElement> = async (e) => {
     if (e.target instanceof HTMLButtonElement) {
-      setSelectedWord(e.target.value);
-      if (openDictMode === 'modal') {
-        open();
+      if (e.target.dataset.list) {
+        const idx = +e.target.dataset.list;
+        setWordListsData((pre) => [...removeOneItemFromArray(pre, idx)]);
       }
-      if (openDictMode === 'tab') {
-        window.open(`${DICT_URL}${e.target.value}`, '_blank')?.focus();
+      if (e.target.dataset.dict_word) {
+        const word = e.target.dataset.dict_word;
+        if (openDictMode === 'modal') {
+          setSelectedWord(word);
+          open();
+        }
+        if (openDictMode === 'tab') {
+          window.open(`${DICT_URL}${word}`, '_blank')?.focus();
+        }
       }
     }
   };
 
   return (
-    <div className="min-w-full flex flex-wrap">
+    <div className="min-w-full flex flex-wrap justify-center gap-4">
       {wordListsData.map((list, listIdx) => (
         <div
           key={'list' + (listIdx + 1)}
-          className="w-full flex-grow mb-6"
+          className="flex-auto mb-6 max-w-screen-sm w-96   "
           onClick={handleShowDict}
         >
-          <h2 className="text-2xl text font-semibold my-2">
-            リスト {listIdx + 1}
-          </h2>
-          {list.map((word, wordIdx) => (
-            <li key={`${word[0]}${listIdx}${wordIdx}`} className="flex  py-2  ">
-              {Array(3)
-                .fill('')
-                .map((_, idx) => (
-                  <div
-                    className="flex-grow w-1/4 border-b-2 border-gray-100 mr-4 pb-2 pt-1"
-                    key={word[idx]}
-                  >
-                    <span className=" ">{word[idx]}</span>
-                  </div>
-                ))}
-              <button value={word[wordIdx]}>📗</button>
-            </li>
-          ))}
+          <div>
+            <div className="flex justify-between">
+              <h2 className="text-2xl text font-semibold my-2">
+                リスト {listIdx + 1}
+              </h2>
+              <button data-list={listIdx}>❌</button>
+            </div>
+          </div>
+          <div className=" ">
+            {list.map((word, wordIdx) => (
+              <li
+                key={`${word[0]}${listIdx}${wordIdx}`}
+                className="flex  py-2  "
+              >
+                {Array(3)
+                  .fill('')
+                  .map((_, idx) => (
+                    <div
+                      className="flex-grow w-1/4 border-b-2 border-gray-100 mr-4 pb-2 pt-1"
+                      key={word[idx]}
+                    >
+                      <span className=" ">{word[idx]}</span>
+                    </div>
+                  ))}
+                <button data-dict_word={word[wordIdx]}>📗</button>
+              </li>
+            ))}
+          </div>
         </div>
       ))}
       <Modal>
