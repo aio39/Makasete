@@ -1,19 +1,25 @@
 import { useModal } from 'react-hooks-use-modal';
 import { IoSettingsSharp } from 'react-icons/io5';
-import { useRecoilState } from 'recoil';
-import { openDictModeState } from '../../recoil/atom';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { isDarkModeState, openDictModeState } from '../../recoil/atom';
 import DarkModeToggle from './DarkModeToggle';
 
 const OptionModal = () => {
   const [openDictMode, setOpenDictMode] = useRecoilState(openDictModeState);
+  const isDarkMode = useRecoilValue(isDarkModeState);
 
   return (
-    <div className=" bg-white w-screen max-w-md  md:max-w-lg flex flex-col items-center justify-center p-8 rounded-lg">
-      <h2 className="text-3xl　 ">
-        <span className="sp">マ</span>
+    <div
+      className={`${
+        isDarkMode ? 'dark bg-gray-800 text-white' : 'bg-white  text-black'
+      } w-screen max-w-md  md:max-w-lg flex flex-col items-center justify-center p-8 rounded-lg`}
+    >
+      <h2 className="text-4xl my-6  font-mono font-bold">
+        マカセテ
+        {/* <span className="sp">マ</span>
         <span className="sp">カ</span>
         <span className="sp">セ</span>
-        <span className="sp">テ</span>
+        <span className="sp">テ</span> */}
       </h2>
       <div>
         <label>사전 오픈 방식</label>

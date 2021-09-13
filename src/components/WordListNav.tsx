@@ -5,7 +5,7 @@ const WordListNav = () => {
   const length = useRecoilValue(wordListLength);
 
   return (
-    <div className="sticky max-w-min bg-gray-400 flex justify-center gap-4 mx-auto bottom-4 py-2 px-4 my-2">
+    <div className="sticky max-w-min bg-mint bg-opacity-30 flex justify-center gap-4 mx-auto bottom-4 py-2 px-4 my-4 rounded-md">
       {Array(length)
         .fill('')
         .map((_, idx) => (

@@ -38,10 +38,10 @@ function App() {
   return (
     <div
       className={`App  box-border ${
-        isDarkMode ? 'dark bg-black' : 'bg-white'
+        isDarkMode ? 'dark bg-gray-800' : 'bg-white'
       } max-w-screen  `}
     >
-      <div className="dark:bg-black dark:text-white  w-full min-h-screen  justify-start  flex flex-col   items-center ">
+      <div className="dark:bg-gray-800 dark:text-white  w-full min-h-screen  justify-start  flex flex-col   items-center ">
         <Navigation />
         {/* <img src={logo} className="App-logo" alt="logo" /> */}
         <main className="w-full px-6 md:mx-8 ">
