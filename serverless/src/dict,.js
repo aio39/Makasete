@@ -5,14 +5,27 @@ const puppeteer = require('puppeteer');
 
 const usePuppeteer = async (word) => {
   try {
+    const args =
+      process.env.MODE === 'dev'
+        ? [
+            '--ignore-certificate-errors',
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-accelerated-2d-canvas',
+            '--disable-gpu',
+          ]
+        : [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '-–disable-dev-shm-usage',
+            '--disable-gpu',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process',
+          ];
+
     const PUPPETEER_OPTIONS = {
-      args: [
-        '--ignore-certificate-errors',
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-accelerated-2d-canvas',
-        '--disable-gpu',
-      ],
+      args,
       headless: true,
       timeout: 4000,
     };
