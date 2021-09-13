@@ -1,62 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-// let LoveIsComic_HTMLTemplate = (url) => {
-//   return `
-//       <!DOCTYPE html>
-//       <html>
-//         <head>
-//            <title>Love Is Comic</title>
-//         </head>
-//         <body>
-//           <img src="${url}"></img>
-//         </body>
-//       </html>`;
-// };
-
-const puppeteer = require('puppeteer');
-
-// /**
-//  * Responds to any HTTP request.
-//  *
-//  * @param {!express:Request} req HTTP request context.
-//  * @param {!express:Response} res HTTP response context.
-//  */
-// exports.sendComic = (req, res) => {
-//   const puppeteer = require('puppeteer');
-
-//   function run() {
-//     return new Promise(async (resolve, reject) => {
-//       try {
-//         const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
-//         const page = await browser.newPage();
-//         await page.goto('https://loveiscomix.com/random');
-//         let imageurl = await page.evaluate(() => {
-//           let item = document.querySelector(
-//             '#primary > main > article > div > div.cellcomic > a > img'
-//           );
-//           return 'https://loveiscomix.com/' + item.getAttribute('src');
-//         });
-//         browser.close();
-//         return resolve(imageurl);
-//       } catch (e) {
-//         return reject(e);
-//       }
-//     });
-//   }
-
-//   run()
-//     .then((url) => {
-//       console.log('Random LoveIs Comic from the following url: ' + url);
-//       res.set('Content-Type', 'text/html');
-//       res.status(200).send(LoveIsComic_HTMLTemplate(url));
-//     })
-//     .catch((err) => {
-//       console.error(err);
-//       res.status(500).send('An Error occured' + err);
-//     });
-// };
-
 const JP_DICT_SEARCH = 'https://ja.dict.naver.com/#/search?query=';
 const JP_DICT_ROOT = 'https://ja.dict.naver.com/';
+const puppeteer = require('puppeteer');
 
 const usePuppeteer = async (word) => {
   try {
@@ -125,4 +70,24 @@ const usePuppeteer = async (word) => {
   }
 };
 
-exports.usePuppeteer = usePuppeteer;
+exports.dict = async (req, res) => {
+  res.set(
+    'Access-Control-Allow-Origin',
+    process.env.HOST || 'http://localhost:3000'
+  );
+  res.set('Access-Control-Allow-Credentials', 'true');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Authorization');
+  res.set('Access-Control-Max-Age', '3600');
+  if (req.method !== 'GET') {
+    return res.status(405).end();
+  }
+
+  usePuppeteer(req.query.word)
+    .then((r) => {
+      res.send(r);
+    })
+    .catch((e) => {
+      res.send(e);
+    });
+};
