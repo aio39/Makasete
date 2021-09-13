@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "helloworld": "functions-framework --target=test",
-    "ocr": "cross-env-file -p ./.env.json functions-framework --target=ocr",
+    "ocr": "cross-env-file -p ./.env.json functions-framework --target=ocr ",
     "dict": "cross-env-file -p ./.env.json functions-framework --target=dict"
   },
   "author": "serverless.com",

@@ -1,15 +1,12 @@
-const vision = require('@google-cloud/vision');
 const Busboy = require('busboy');
-const axios = require('axios');
+
 const { memoryUsage } = require('process');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
-const { Translate } = require('@google-cloud/translate').v2;
-const { runKuromoji } = require('./kuromiji.js');
-
 const translateByGCP = async (textList) => {
+  const { Translate } = require('@google-cloud/translate').v2;
   const translate = new Translate({
     projectId: process.env.GCP_PROJECT || 'makasete',
   });
@@ -86,8 +83,11 @@ exports.ocr = (req, res) => {
     }
 
     await Promise.all(fileWritePromises);
-    const client = new vision.ImageAnnotatorClient();
-    const detectedText = await client
+    fileWritePromises.length = 0;
+    let vision = require('@google-cloud/vision');
+    let client = new vision.ImageAnnotatorClient();
+    vision = null;
+    let detectedText = await client
       .textDetection({
         image: {
           content: new Uint8Array(imageData),
@@ -99,8 +99,10 @@ exports.ocr = (req, res) => {
       .finally(() => {
         imageData = null;
       });
+    client = null;
 
-    const rawText = detectedText[0].fullTextAnnotation.text;
+    let rawText = detectedText[0].fullTextAnnotation.text;
+    detectedText = null;
 
     if (mode === 0) {
       const kanjiText = rawText
@@ -108,10 +110,11 @@ exports.ocr = (req, res) => {
         .replace(/\n/g, ' ') // 줄바꿈 제거
         .replace(/ +(?= )/g, '') // 2칸 이상 공백 제거
         .trim(); // 좌우 공백 제거
-
+      rawText = null;
       const delimiter = '*';
       const kanjiTextList = kanjiText.split(' ');
 
+      let axios = require('axios');
       const [
         {
           data: { converted: hiraganaText },
@@ -130,6 +133,7 @@ exports.ocr = (req, res) => {
           }),
         translateByGCP(kanjiText.replace(/ /g, '。 ').split(' ')),
       ]);
+      axios = null;
 
       const hiraganaTextList = hiraganaText
         .replace(/( * )+/g, '')
@@ -156,9 +160,14 @@ exports.ocr = (req, res) => {
         助詞: '助詞', //  の　と　は
         記号: '記号', // 공백 ， ） 。
       };
-      const kuroResult = await runKuromoji({
+
+      let { runKuromoji } = require('./kuromiji.js');
+      let kuroResult = await runKuromoji({
         text: rawText.replace(/\n/g, ' '),
       });
+      // delete require.cache[require.resolve('./kuromiji.js')];
+      // runKuromoji = null;
+
       const hiraganaTextList = [];
       const kanjiTextList = [];
       kuroResult.forEach((curr) => {
@@ -193,6 +202,7 @@ exports.ocr = (req, res) => {
         hiraganaTextList.push(kanaToHira(reading));
         kanjiTextList.push(basic_form);
       });
+      kuroResult = null;
 
       const hangulTextList = await translateByGCP(kanjiTextList);
 
