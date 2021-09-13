@@ -7,7 +7,10 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
-ReactGA.initialize(process.env.GA_CODE as string);
+
+// NOTE CRA에서 환경변수 prefix 주의
+ReactGA.initialize(process.env.REACT_APP_GA_CODE as string);
+
 ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>
