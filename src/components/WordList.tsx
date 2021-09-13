@@ -2,7 +2,7 @@ import { FC, useState } from 'react';
 import { useModal } from 'react-hooks-use-modal';
 import Iframe from 'react-iframe';
 import { useRecoilValue } from 'recoil';
-import { textState } from '../recoil/atom';
+import { openDictModeState, textState } from '../recoil/atom';
 // const handleShowDict: React.MouseEventHandler<HTMLElement> = async (e) => {
 //   if (e.target instanceof HTMLButtonElement) {
 //     const word = e.target.value;
@@ -21,8 +21,12 @@ import { textState } from '../recoil/atom';
 //     }
 //   }
 // };
+
+const DICT_URL = 'https://ja.dict.naver.com/#/search?range=word&query=';
+
 const WordList: FC<any> = () => {
   const wordListsData = useRecoilValue(textState);
+  const openDictMode = useRecoilValue(openDictModeState);
   const [selectedWord, setSelectedWord] = useState<string>();
   const [Modal, open, close, isOpen] = useModal('root', {
     preventScroll: false,
@@ -32,7 +36,12 @@ const WordList: FC<any> = () => {
   const handleShowDict: React.MouseEventHandler<HTMLElement> = async (e) => {
     if (e.target instanceof HTMLButtonElement) {
       setSelectedWord(e.target.value);
-      open();
+      if (openDictMode === 'modal') {
+        open();
+      }
+      if (openDictMode === 'tab') {
+        window.open(`${DICT_URL}${e.target.value}`, '_blank')?.focus();
+      }
     }
   };
 
@@ -70,7 +79,7 @@ const WordList: FC<any> = () => {
           onClick={close}
         >
           <Iframe
-            url={`https://ja.dict.naver.com/#/search?range=word&query=${selectedWord}`}
+            url={`${DICT_URL}${selectedWord}`}
             width="100%"
             height="100%"
             id="myId"
