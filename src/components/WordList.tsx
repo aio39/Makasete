@@ -58,6 +58,7 @@ const WordList: FC<any> = () => {
       {wordListsData.map((list, listIdx) => (
         <div
           key={'list' + (listIdx + 1)}
+          id={'list' + (listIdx + 1)}
           className="flex-auto mb-6 max-w-screen-sm w-96   "
           onClick={handleShowDict}
         >
@@ -85,7 +86,7 @@ const WordList: FC<any> = () => {
                       <span className=" ">{word[idx]}</span>
                     </div>
                   ))}
-                <button data-dict_word={word[wordIdx]}>📗</button>
+                <button data-dict_word={word[0]}>📗</button>
               </li>
             ))}
           </div>
