@@ -1,40 +1,44 @@
-import axios from 'axios';
 import { FC, useState } from 'react';
+import { useModal } from 'react-hooks-use-modal';
+import Iframe from 'react-iframe';
 import { useRecoilValue } from 'recoil';
 import { textState } from '../recoil/atom';
+// const handleShowDict: React.MouseEventHandler<HTMLElement> = async (e) => {
+//   if (e.target instanceof HTMLButtonElement) {
+//     const word = e.target.value;
 
+//     const resultHtml = await axios
+//       .get(`${process.env.REACT_APP_DICT_URL}?word=${word} `, {
+//         headers: {},
+//         withCredentials: true,
+//       })
+//       .catch((e) => {
+//         alert(e);
+//       });
+//     if (resultHtml) {
+//       console.log(resultHtml.data);
+//       setHtml(resultHtml.data);
+//     }
+//   }
+// };
 const WordList: FC<any> = () => {
-  const text = useRecoilValue(textState);
-  const [html, setHtml] = useState<string>('');
+  const wordListsData = useRecoilValue(textState);
+  const [selectedWord, setSelectedWord] = useState<string>();
+  const [Modal, open, close, isOpen] = useModal('root', {
+    preventScroll: false,
+    closeOnOverlayClick: true,
+  });
 
   const handleShowDict: React.MouseEventHandler<HTMLElement> = async (e) => {
     if (e.target instanceof HTMLButtonElement) {
-      const word = e.target.value;
-
-      const resultHtml = await axios
-        .get(`${process.env.REACT_APP_DICT_URL}?word=${word} `, {
-          headers: {},
-          withCredentials: true,
-        })
-        .catch((e) => {
-          alert(e);
-        });
-      if (resultHtml) {
-        console.log(resultHtml.data);
-        setHtml(resultHtml.data);
-      }
+      setSelectedWord(e.target.value);
+      open();
     }
   };
 
-  function createMarkup() {
-    return { __html: html };
-  }
-
   return (
     <div className="min-w-full flex flex-wrap">
-      {html !== '' && <div dangerouslySetInnerHTML={createMarkup()}></div>}
-
-      {text.map((list, listIdx) => (
+      {wordListsData.map((list, listIdx) => (
         <div
           key={'list' + (listIdx + 1)}
           className="w-full flex-grow mb-6"
@@ -55,11 +59,27 @@ const WordList: FC<any> = () => {
                     <span className=" ">{word[idx]}</span>
                   </div>
                 ))}
-              <button value={word[wordIdx]}>V</button>
+              <button value={word[wordIdx]}>📗</button>
             </li>
           ))}
         </div>
       ))}
+      <Modal>
+        <div
+          className="h-screen w-screen flex items-center p-12"
+          onClick={close}
+        >
+          <Iframe
+            url={`https://ja.dict.naver.com/#/search?range=word&query=${selectedWord}`}
+            width="100%"
+            height="100%"
+            id="myId"
+            className=" "
+            display="block"
+            position="relative"
+          />
+        </div>
+      </Modal>
     </div>
   );
 };
