@@ -1,11 +1,15 @@
 import axios from 'axios';
 import React, {
+  ReactElement,
   useCallback,
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
 } from 'react';
+import { AiOutlineRotateRight } from 'react-icons/ai';
+import { BiReset } from 'react-icons/bi';
+import { IoCut } from 'react-icons/io5';
 import { Crop } from 'react-image-crop';
 import { useSetRecoilState } from 'recoil';
 import imageToJpegDataUrlWorker from '../pwa/ImageToJpegDataUrl';
@@ -230,43 +234,67 @@ const ImageUpload = () => {
         </div>
       </div>
       {!false && (
-        <div className="flex justify-center gap-4 ">
-          <button
-            onClick={handleConfirmCrop}
-            className="bg-mint text-white p-2"
+        <div className="flex flex-col items-center">
+          <div className="text-2xl w-full max-w-screen-md flex  justify-between mb-4">
+            {(
+              [
+                [handleConfirmCrop, <IoCut />],
+                [handleResetCrop, <BiReset />],
+                [handleRotateImage, <AiOutlineRotateRight />],
+              ] as [() => void, ReactElement][]
+            ).map((btnData, idx) => {
+              return (
+                <button
+                  key={'editBtn' + idx}
+                  onClick={btnData[0]}
+                  className="bg-mint text-white py-3 px-5 rounded-sm mx-4 "
+                >
+                  {btnData[1]}
+                </button>
+              );
+            })}
+          </div>
+          <div
+            onChange={handleOCRMode}
+            className="flex w-full justify-around mb-2"
           >
-            자르기
-          </button>
-          <button onClick={handleResetCrop} className="bg-mint text-white p-2">
-            자르기 리셋
-          </button>
-          <button
-            onClick={handleSendToServer}
-            className="bg-mint text-white p-2"
-          >
-            단어 리스트 생성
-          </button>
-          <button
-            onClick={handleRotateImage}
-            className="bg-mint text-white p-2"
-          >
-            사진 회전
-          </button>
-          <div onChange={handleOCRMode}>
-            <input
-              type="radio"
-              value="0"
-              name="문장모드"
-              checked={ocrMode === '0'}
-            />{' '}
-            단어 리스트
-            <input
-              type="radio"
-              value="1"
-              name="gender"
-              checked={ocrMode === '1'}
-            />{' '}
-            문장
+            <label
+              htmlFor="단어모드"
+              className=" flex justify-center items-center"
+            >
+              <input
+                id="단어모드"
+                type="radio"
+                value="0"
+                name="단어모드"
+                checked={ocrMode === '0'}
+                className="mr-2 text-mint"
+              />
+              단어 리스트
+            </label>
+            <label
+              htmlFor="문장모드"
+              className=" flex justify-center items-center "
+            >
+              <input
+                id="문장모드"
+                type="radio"
+                value="1"
+                name="문장모드"
+                checked={ocrMode === '1'}
+                className="mr-2 text-mint "
+              />
+              문장
+            </label>
+          </div>
+          <div>
+            <button
+              onClick={handleSendToServer}
+              // disabled={croppedImageDataUrlList.length === 0}
+              className="bg-mint text-white py-2 px-4 rounded-sm my-4"
+            >
+              단어 리스트 생성
+            </button>
           </div>
         </div>
       )}
