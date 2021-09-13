@@ -7,6 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import ReactGA from 'react-ga';
 import { AiOutlineRotateRight } from 'react-icons/ai';
 import { BiReset } from 'react-icons/bi';
 import { IoCut } from 'react-icons/io5';
@@ -87,6 +88,10 @@ const ImageUpload = () => {
           return result.data;
         } catch (error) {
           console.error(error);
+          ReactGA.event({
+            category: 'OCR',
+            action: `Failed`,
+          });
           alert(error);
           throw new Error('error');
         }
@@ -100,6 +105,10 @@ const ImageUpload = () => {
       });
 
     if (!result) return;
+    ReactGA.event({
+      category: 'OCR',
+      action: `Success`,
+    });
     setCroppedImageDataUrlList(() => []);
     setTextState((pre) => [...pre, ...(result as string[][][])]);
   }, [

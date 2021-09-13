@@ -4,16 +4,50 @@ resources:
     properties:
       location: asia-northeast3
   - type: gcp-types/cloudfunctions-v1:projects.locations.functions
-    name: serverless-dev-first
+    name: serverless-dev-test
     properties:
       parent: projects/makasete/locations/asia-northeast3
-      availableMemoryMb: 256
-      runtime: nodejs
+      availableMemoryMb: 512
+      runtime: nodejs14
       timeout: 60s
-      entryPoint: http
-      function: serverless-dev-first
+      entryPoint: test
+      function: serverless-dev-test
       sourceArchiveUrl: >-
-        gs://sls-serverless-dev-1630407891849/serverless/serverless/dev/1630407899562-2021-08-31T11:04:59.562Z/serverless.zip
+        gs://sls-serverless-dev-1630407891849/serverless/serverless/dev/1631547537170-2021-09-13T15:38:57.170Z/serverless.zip
+      environmentVariables:
+        HOST: https://makasete.vercel.app/
       labels: {}
       httpsTrigger:
-        url: path
+        url: test
+  - type: gcp-types/cloudfunctions-v1:projects.locations.functions
+    name: serverless-dev-ocr
+    properties:
+      parent: projects/makasete/locations/asia-northeast3
+      availableMemoryMb: 512
+      runtime: nodejs14
+      timeout: 60s
+      entryPoint: ocr
+      function: serverless-dev-ocr
+      sourceArchiveUrl: >-
+        gs://sls-serverless-dev-1630407891849/serverless/serverless/dev/1631547537170-2021-09-13T15:38:57.170Z/serverless.zip
+      environmentVariables:
+        HOST: https://makasete.vercel.app/
+      labels: {}
+      httpsTrigger:
+        url: ocr
+  - type: gcp-types/cloudfunctions-v1:projects.locations.functions
+    name: serverless-dev-dict
+    properties:
+      parent: projects/makasete/locations/asia-northeast3
+      availableMemoryMb: 512
+      runtime: nodejs14
+      timeout: 60s
+      entryPoint: dict
+      function: serverless-dev-dict
+      sourceArchiveUrl: >-
+        gs://sls-serverless-dev-1630407891849/serverless/serverless/dev/1631547537170-2021-09-13T15:38:57.170Z/serverless.zip
+      environmentVariables:
+        HOST: https://makasete.vercel.app/
+      labels: {}
+      httpsTrigger:
+        url: dict

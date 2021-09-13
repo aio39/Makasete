@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import ReactGA from 'react-ga';
 import { useModal } from 'react-hooks-use-modal';
 import { IoSettingsSharp } from 'react-icons/io5';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -7,7 +9,9 @@ import DarkModeToggle from './DarkModeToggle';
 const OptionModal = () => {
   const [openDictMode, setOpenDictMode] = useRecoilState(openDictModeState);
   const isDarkMode = useRecoilValue(isDarkModeState);
-
+  useEffect(() => {
+    ReactGA.modalview('셋팅 모달달');
+  }, []);
   return (
     <div
       className={`${

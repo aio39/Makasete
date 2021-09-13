@@ -1,11 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import ReactGA from 'react-ga';
 import { RecoilRoot } from 'recoil';
 import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
+ReactGA.initialize(process.env.GA_CODE as string);
 ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>

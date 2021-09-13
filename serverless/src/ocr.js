@@ -220,4 +220,4 @@ exports.ocr = (req, res) => {
     }
   });
   busboy.end(req.rawBody);
-};
+}

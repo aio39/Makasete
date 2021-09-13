@@ -11,6 +11,7 @@ provider:
   # https://serverless.com/framework/docs/providers/google/guide/credentials/
   #
   # the path to the credentials file needs to be absolute
+  memorySize: 512
   credentials: /home/aio/gcp/gcp_makasete.json
   environment:
     D2_ID: ${env:D2_ID}
