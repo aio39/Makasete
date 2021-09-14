@@ -18,6 +18,7 @@ import { cropState, isLoadingOcrState, textState } from '../recoil/atom';
 import { dataURItoBlob } from '../util/dataURItoBlob';
 import rotateDataUrlOfImage from '../util/rotateImage';
 import CropZone from './uploadPart/CropZone';
+import EditButton from './uploadPart/EditButton';
 import ImageInputZone from './uploadPart/ImageInputZone';
 
 const ImageUpload = () => {
@@ -247,21 +248,17 @@ const ImageUpload = () => {
           <div className="text-2xl w-full max-w-screen-md flex  justify-between mb-4">
             {(
               [
-                [handleConfirmCrop, <IoCut />],
-                [handleResetCrop, <BiReset />],
-                [handleRotateImage, <AiOutlineRotateRight />],
-              ] as [() => void, ReactElement][]
-            ).map((btnData, idx) => {
-              return (
-                <button
-                  key={'editBtn' + idx}
-                  onClick={btnData[0]}
-                  className="bg-mint text-white py-3 px-5 rounded-sm mx-4 "
-                >
-                  {btnData[1]}
-                </button>
-              );
-            })}
+                [handleConfirmCrop, <IoCut />, Boolean(uploadedImage)],
+                [handleResetCrop, <BiReset />, Boolean(completedCrop?.width)],
+                [
+                  handleRotateImage,
+                  <AiOutlineRotateRight />,
+                  Boolean(uploadedImage),
+                ],
+              ] as [() => void, ReactElement, boolean][]
+            ).map((btnData, idx) => (
+              <EditButton btnData={btnData} idx={idx} />
+            ))}
           </div>
           <div
             onChange={handleOCRMode}
@@ -300,7 +297,9 @@ const ImageUpload = () => {
             <button
               onClick={handleSendToServer}
               // disabled={croppedImageDataUrlList.length === 0}
-              className="bg-mint text-white py-2 px-4 rounded-sm my-4"
+              className={`bg-mint text-white py-2 px-4 rounded-sm my-4  ${
+                croppedImageDataUrlList?.length || 'bg-opacity-30'
+              } `}
             >
               단어 리스트 생성
             </button>
