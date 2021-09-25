@@ -13,6 +13,7 @@ import { BiReset } from 'react-icons/bi';
 import { IoCut } from 'react-icons/io5';
 import { Crop } from 'react-image-crop';
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import imageRotateWorker from '../pwa/ImageRotate';
 import imageToJpegDataUrlWorker from '../pwa/ImageToJpegDataUrl';
 import { cropState, isLoadingOcrState, textState } from '../recoil/atom';
 import { dataURItoBlob } from '../util/dataURItoBlob';
@@ -22,7 +23,7 @@ import EditButton from './uploadPart/EditButton';
 import ImageInputZone from './uploadPart/ImageInputZone';
 
 const ImageUpload = () => {
-  const worker = useMemo(() => {
+  const workerA = useMemo(() => {
     if (!window.OffscreenCanvas) return null;
     const worker = new Worker(imageToJpegDataUrlWorker);
     worker.onmessage = (
@@ -39,6 +40,25 @@ const ImageUpload = () => {
     };
     return worker;
   }, []);
+  const workerB = useMemo(() => {
+    if (!window.OffscreenCanvas) return null;
+    const worker = new Worker(imageRotateWorker);
+    worker.onmessage = (
+      m: MessageEvent<{ success: boolean; data: string }>
+    ) => {
+      console.log(m);
+      if (m.data?.success) {
+        // setCroppedImageDataUrlList((pre) => [...pre, m.data.data]);
+        cropTargetImageRef.current?.setAttribute('src', m.data.data);
+        workerA?.postMessage({ imageUrl: m.data.data });
+      } else {
+        console.log(m.data);
+        alert(m.data.data); //
+        // setUploadedImage(null);
+      }
+    };
+    return worker;
+  }, [workerA]);
   const cropTargetImageRef = useRef<HTMLImageElement>();
   const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
   const [uploadedImage, setUploadedImage] = useState<Object | null>(null);
@@ -53,15 +73,15 @@ const ImageUpload = () => {
 
   useEffect(() => {
     return () => {
-      worker?.terminate();
+      workerA?.terminate();
     };
-  }, [worker]);
+  }, [workerA]);
 
   const setWorkerImage = useCallback(
     (imageUrl) => {
-      worker?.postMessage({ imageUrl });
+      workerA?.postMessage({ imageUrl });
     },
-    [worker]
+    [workerA]
   );
 
   const handleSendToServer = useCallback(async () => {
@@ -74,9 +94,7 @@ const ImageUpload = () => {
       croppedImageDataUrlList.map(async (dataOrObjectUrl) => {
         const params = new FormData();
         if (window.OffscreenCanvas) {
-          console.time('fetch');
           const blob = await fetch(dataOrObjectUrl).then((r) => r.blob());
-          console.timeEnd('fetch');
           params.append('image', blob);
         } else {
           params.append('image', dataURItoBlob(dataOrObjectUrl));
@@ -160,7 +178,7 @@ const ImageUpload = () => {
         scaleY,
         pixelRatio,
       };
-      worker?.postMessage({ drawData });
+      workerA?.postMessage({ drawData });
     } else {
       const canvas = document.createElement('canvas') as any;
       const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -187,7 +205,7 @@ const ImageUpload = () => {
         canvas.toDataURL('image/jpeg', 0.7) as string,
       ]);
     }
-  }, [completedCrop, worker]);
+  }, [completedCrop, workerA]);
 
   const handleDeleteCrop = (e: any) => {
     setCroppedImageDataUrlList((pre) => {
@@ -199,11 +217,25 @@ const ImageUpload = () => {
   };
 
   const handleRotateImage = async () => {
-    const newDataUrl = await rotateDataUrlOfImage(
-      cropTargetImageRef.current?.getAttribute('src') as string
-    );
-    cropTargetImageRef.current?.setAttribute('src', newDataUrl);
-    worker?.postMessage({ imageUrl: newDataUrl });
+    const curDataUrl = cropTargetImageRef.current?.getAttribute(
+      'src'
+    ) as string;
+
+    if (window.OffscreenCanvas) {
+      const img = new Image();
+      img.onload = () => {
+        workerB?.postMessage({
+          dataUrl: curDataUrl,
+          width: img.width,
+          height: img.height,
+        });
+      };
+      img.src = curDataUrl;
+    } else {
+      const newDataUrl = await rotateDataUrlOfImage(curDataUrl);
+      cropTargetImageRef.current?.setAttribute('src', newDataUrl);
+      workerA?.postMessage({ imageUrl: newDataUrl });
+    }
   };
 
   const handleResetCrop = () => {

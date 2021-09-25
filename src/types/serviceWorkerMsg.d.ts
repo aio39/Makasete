@@ -11,3 +11,10 @@ interface imageToJpegDataUrlWorkerMsg {
   imageUrl: string;
   drawData: drawData;
 }
+
+
+interface imageRotateWorkerMsg {
+  dataUrl: string;
+  width: string;
+  height: string;
+}

@@ -49,7 +49,7 @@ const OptionModal = () => {
 };
 
 const Navigation = () => {
-  const [Modal, open, close, isOpen] = useModal('root', {
+  const [Modal, open] = useModal('root', {
     preventScroll: false,
     closeOnOverlayClick: true,
   });

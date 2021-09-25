@@ -29,10 +29,10 @@ const WordList: FC<any> = () => {
   const [wordListsData, setWordListsData] = useRecoilState(textState);
   const openDictMode = useRecoilValue(openDictModeState);
   const [selectedWord, setSelectedWord] = useState<string>();
-  const [Modal, open, close, isOpen] = useModal('root', {
+  const [Modal, open, close] = useModal('root', {
     preventScroll: false,
     closeOnOverlayClick: true,
-  });
+  }); // , isOpen
 
   const handleShowDict: React.MouseEventHandler<HTMLElement> = async (e) => {
     if (e.target instanceof HTMLButtonElement) {
