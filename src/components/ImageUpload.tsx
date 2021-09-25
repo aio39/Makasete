@@ -5,14 +5,14 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from 'react';
 import ReactGA from 'react-ga';
 import { AiOutlineRotateRight } from 'react-icons/ai';
 import { BiReset } from 'react-icons/bi';
 import { IoCut } from 'react-icons/io5';
 import { Crop } from 'react-image-crop';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import imageToJpegDataUrlWorker from '../pwa/ImageToJpegDataUrl';
 import { cropState, isLoadingOcrState, textState } from '../recoil/atom';
 import { dataURItoBlob } from '../util/dataURItoBlob';
@@ -25,8 +25,17 @@ const ImageUpload = () => {
   const worker = useMemo(() => {
     if (!window.OffscreenCanvas) return null;
     const worker = new Worker(imageToJpegDataUrlWorker);
-    worker.onmessage = (m) => {
-      setCroppedImageDataUrlList((pre) => [...pre, m.data]);
+    worker.onmessage = (
+      m: MessageEvent<{ success: boolean; data: string }>
+    ) => {
+      console.log(m);
+      if (m.data?.success) {
+        setCroppedImageDataUrlList((pre) => [...pre, m.data.data]);
+      } else {
+        console.log(m.data);
+        alert(m.data.data); // 실패 메세지
+        setUploadedImage(null);
+      }
     };
     return worker;
   }, []);
@@ -38,7 +47,7 @@ const ImageUpload = () => {
   >([]);
   const [ocrMode, setOcrMode] = useState('0');
 
-  const setIsLoadingOcr = useSetRecoilState(isLoadingOcrState);
+  const [isLoadingOcr, setIsLoadingOcr] = useRecoilState(isLoadingOcrState);
   const setTextState = useSetRecoilState(textState);
   const setCrop = useSetRecoilState(cropState);
 
@@ -121,7 +130,10 @@ const ImageUpload = () => {
   ]);
 
   const handleConfirmCrop = useCallback(() => {
-    if (!cropTargetImageRef.current) return;
+    if (!cropTargetImageRef.current) {
+      alert('이미지 데이터가 없습니다.');
+      return;
+    }
 
     const image = cropTargetImageRef.current;
     const crop: Crop =
@@ -217,16 +229,17 @@ const ImageUpload = () => {
         setCompletedCrop={setCompletedCrop}
       />
 
-      <div className="overflow-scroll w-screen">
+      <div className="overflow-x-scroll  w-full pt-4 ">
         <div
-          className="flex flex-row justify-center gap-4 w-full mb-6 "
+          className="flex flex-row justify-center w-full mb-6 "
           onClick={handleDeleteCrop}
         >
           {croppedImageDataUrlList.map((imgUrl, idx) => (
             <div
               key={'cropImage' + idx}
-              className="group w-40 h-40 relative border-2 border-gray-700 flex-shrink-0"
+              className="group w-40 h-40 relative border-2 border-gray-700 flex-shrink-0 mx-3"
             >
+              <span className={isLoadingOcr ? 'ocrLoader' : ''}></span>
               <button
                 data-idx={idx}
                 className="hidden z-10 group-hover:block absolute text-2xl m-auto inset-0 w-full  cursor-pointer "
@@ -244,7 +257,7 @@ const ImageUpload = () => {
         </div>
       </div>
       {!false && (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center ">
           <div className="text-2xl w-full max-w-screen-md flex  justify-between mb-4">
             {(
               [
@@ -257,7 +270,7 @@ const ImageUpload = () => {
                 ],
               ] as [() => void, ReactElement, boolean][]
             ).map((btnData, idx) => (
-              <EditButton btnData={btnData} idx={idx} />
+              <EditButton key={'editBtn' + idx} btnData={btnData} idx={idx} />
             ))}
           </div>
           <div

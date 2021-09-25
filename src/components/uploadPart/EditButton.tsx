@@ -6,7 +6,7 @@ const EditButton: FC<{
 }> = ({ btnData, idx }) => {
   return (
     <button
-      key={'editBtn' + idx}
+      key={'editBtn' + idx.toString()}
       onClick={btnData[0]}
       className={`bg-mint text-white py-3 px-5 rounded-sm mx-4  ${
         btnData[2] ? '' : 'bg-opacity-30'

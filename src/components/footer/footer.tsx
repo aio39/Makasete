@@ -7,7 +7,7 @@ const IconLink: FC<{ iconData: { icon: ReactElement; link: string } }> = ({
   iconData: { icon, link },
 }) => {
   return (
-    <ul>
+    <ul key={link}>
       <a href={link} className="text-2xl">
         {icon}
       </a>

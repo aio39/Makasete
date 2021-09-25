@@ -1,6 +1,12 @@
 /* eslint-disable no-restricted-globals */
 import { imageToJpegDataUrlWorkerMsg } from '../types/serviceWorkerMsg';
 
+
+interface message {
+  success: boolean;
+  data?: string;
+}
+
 const workerCode = () => {
   function dataURItoBlob(dataURI: string) {
     const byteString = atob(dataURI.split(',')[1]);
@@ -24,6 +30,13 @@ const workerCode = () => {
     }
     if (e.data.drawData) {
       console.info('service worker is Cropping Image');
+      if (!imageBitmap) {
+        self.postMessage({
+          success: false,
+          data: '이미지 데이터가 소실되었습니다.',
+        } as message);
+        return;
+      }
       const { crop, scaleX, scaleY, pixelRatio } = e.data.drawData;
       offscreen.width = crop.width * pixelRatio * scaleX;
       offscreen.height = crop.height * pixelRatio * scaleY;
@@ -50,7 +63,7 @@ const workerCode = () => {
         .convertToBlob({ type: 'image/jpeg', quality: 0.7 })
         .then((blob) => {
           const objectUrl = URL.createObjectURL(blob);
-          self.postMessage(objectUrl);
+          self.postMessage({ success: true, data: objectUrl });
         });
     }
   };
