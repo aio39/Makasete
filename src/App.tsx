@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import 'react-toastify/dist/ReactToastify.css';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import Footer from './components/footer/footer';
 import Navigation from './components/header/Navigation';

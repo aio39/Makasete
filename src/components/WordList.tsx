@@ -54,12 +54,12 @@ const WordList: FC<any> = () => {
   };
 
   return (
-    <div className="min-w-full flex flex-wrap justify-center gap-4">
+    <div className="min-w-full flex flex-wrap justify-center">
       {wordListsData.map((list, listIdx) => (
         <div
           key={'list' + (listIdx + 1)}
           id={'list' + (listIdx + 1)}
-          className="flex-auto mb-6 max-w-screen-sm w-96   "
+          className="flex-auto mb-6 max-w-screen-sm w-96 mx-2 "
           onClick={handleShowDict}
         >
           <div>

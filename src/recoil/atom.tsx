@@ -21,6 +21,11 @@ export const isNowEditingState = atom({
   default: false,
 });
 
+export const cropFpsState = atom({
+  key: 'cropFps',
+  default: parseInt(localStorage.getItem('fps') as string) || 60,
+});
+
 export const textState = atom<string[][][]>({
   key: 'textState', // unique ID (with respect to other atoms/selectors)
   default: [

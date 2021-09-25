@@ -5,13 +5,13 @@ const WordListNav = () => {
   const length = useRecoilValue(wordListLength);
 
   return (
-    <div className="sticky max-w-min bg-mint bg-opacity-30 flex justify-center gap-4 mx-auto bottom-4 py-2 px-4 my-4 rounded-md">
+    <div className="sticky max-w-min bg-mint bg-opacity-30 flex justify-center mx-auto bottom-4 py-2 px-4 my-4 rounded-md">
       {Array(length)
         .fill('')
         .map((_, idx) => (
           <div
             key={`page${idx + 1}`}
-            className="hover:text-mint cursor-pointer "
+            className="hover:text-mint cursor-pointer mx-2"
           >
             <a href={`#list${idx + 1}`} className="text-lg ">
               {idx + 1}

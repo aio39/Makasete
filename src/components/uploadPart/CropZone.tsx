@@ -2,8 +2,8 @@ import { useThrottleCallback } from '@react-hook/throttle';
 import React, { FC, memo, useCallback } from 'react';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { useRecoilState } from 'recoil';
-import { cropState } from '../../recoil/atom';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { cropFpsState, cropState } from '../../recoil/atom';
 import './overwriteCropStyle.css';
 
 interface ICropZone {
@@ -18,10 +18,11 @@ const CropZone: FC<ICropZone> = ({
   setCompletedCrop,
 }) => {
   const [crop, setCrop] = useRecoilState(cropState);
+  const fps = useRecoilValue(cropFpsState);
 
   const throttleSetCrop = useThrottleCallback((c: Crop) => {
     setCrop(c);
-  }, 60);
+  }, fps);
   // const [crop, setCrop] = useThrottle({ unit: '%' }, 60);
 
   const onLoad = useCallback(
