@@ -14,14 +14,12 @@ const workerCode = () => {
   }
 
   self.onmessage = async (e: MessageEvent<imageRotateWorkerMsg>) => {
-    console.log('aaaa');
+    console.info('service worker is rotating Image');
+
     if (e.data.dataUrl) {
-      console.log(e.data.dataUrl);
       const { dataUrl, width: w, height: h } = e.data;
       const width = parseInt(w);
       const height = parseInt(h);
-      console.info('service worker is rotating Image');
-
       const imageBlob = dataURItoBlob(dataUrl);
       const imageBitmap = await createImageBitmap(imageBlob);
 
@@ -32,7 +30,7 @@ const workerCode = () => {
 
       canvasContext.rotate((90 * Math.PI) / 180);
       canvasContext.drawImage(imageBitmap, 0, -height);
-      console.log(imageBitmap);
+
       canvas
         .convertToBlob({ type: 'image/jpeg', quality: 0.9 })
         .then((blob) => {

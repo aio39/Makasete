@@ -17,7 +17,6 @@ const Temp = () => {
     const {
       data: { text },
     } = await worker.recognize('http://localhost:3000/jp3.png');
-    console.log(text.split('\n'));
     await worker.terminate();
   })();
 

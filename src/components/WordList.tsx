@@ -4,24 +4,6 @@ import Iframe from 'react-iframe';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { openDictModeState, textState } from '../recoil/atom';
 import removeOneItemFromArray from '../util/removeOneItemFromArray';
-// const handleShowDict: React.MouseEventHandler<HTMLElement> = async (e) => {
-//   if (e.target instanceof HTMLButtonElement) {
-//     const word = e.target.value;
-
-//     const resultHtml = await axios
-//       .get(`${process.env.REACT_APP_DICT_URL}?word=${word} `, {
-//         headers: {},
-//         withCredentials: true,
-//       })
-//       .catch((e) => {
-//         alert(e);
-//       });
-//     if (resultHtml) {
-//       console.log(resultHtml.data);
-//       setHtml(resultHtml.data);
-//     }
-//   }
-// };
 
 const DICT_URL = 'https://ja.dict.naver.com/#/search?range=word&query=';
 

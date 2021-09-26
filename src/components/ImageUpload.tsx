@@ -12,6 +12,7 @@ import { AiOutlineRotateRight } from 'react-icons/ai';
 import { BiReset } from 'react-icons/bi';
 import { IoCut } from 'react-icons/io5';
 import { Crop } from 'react-image-crop';
+import { toast, ToastContainer } from 'react-toastify';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import imageRotateWorker from '../pwa/ImageRotate';
 import imageToJpegDataUrlWorker from '../pwa/ImageToJpegDataUrl';
@@ -30,11 +31,9 @@ const ImageUpload = () => {
     worker.onmessage = (
       m: MessageEvent<{ success: boolean; data: string }>
     ) => {
-      console.log(m);
       if (m.data?.success) {
         setCroppedImageDataUrlList((pre) => [...pre, m.data.data]);
       } else {
-        console.log(m.data);
         alert(m.data.data); // 실패 메세지
         setUploadedImage(null);
       }
@@ -47,15 +46,13 @@ const ImageUpload = () => {
     worker.onmessage = (
       m: MessageEvent<{ success: boolean; data: string }>
     ) => {
-      console.log(m);
+      console.info('service worker finish rotate');
       if (m.data?.success) {
-        // setCroppedImageDataUrlList((pre) => [...pre, m.data.data]);
         cropTargetImageRef.current?.setAttribute('src', m.data.data);
         workerA?.postMessage({ imageUrl: m.data.data });
       } else {
-        console.log(m.data);
-        alert(m.data.data); //
-        // setUploadedImage(null);
+        console.error(m.data);
+        alert(m.data.data);
       }
     };
     return worker;
@@ -225,6 +222,7 @@ const ImageUpload = () => {
     if (window.OffscreenCanvas) {
       const img = new Image();
       img.onload = () => {
+        console.info('service worker start to rotate image');
         workerB?.postMessage({
           dataUrl: curDataUrl,
           width: img.width,
@@ -250,6 +248,7 @@ const ImageUpload = () => {
     }
   };
 
+  const notify = () => toast('Wow so easy!');
   return (
     <section className="w-full flex flex-col items-center">
       <ImageInputZone
@@ -363,6 +362,8 @@ const ImageUpload = () => {
           </div>
         </div>
       )}
+      <button onClick={notify}>Notify!</button>
+      <ToastContainer />
     </section>
   );
 };
