@@ -79,6 +79,9 @@ function registerValidSW(swUrl: string, config?: Config) {
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
               }
+              // const updateNow = confirm(
+              //   '업데이트가 가능합니다. 업데이트 하시겠습니까?'
+              // );
             } else {
               // At this point, everything has been precached.
               // It's the perfect time to display a

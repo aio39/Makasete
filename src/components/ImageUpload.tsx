@@ -72,8 +72,9 @@ const ImageUpload = () => {
   useEffect(() => {
     return () => {
       workerA?.terminate();
+      workerB?.terminate();
     };
-  }, [workerA]);
+  }, [workerA, workerB]);
 
   const setWorkerImage = useCallback(
     (imageUrl) => {
