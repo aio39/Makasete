@@ -1,3 +1,4 @@
 const STORE = 'wordStore';
+const DB_NAME = 'db';
 
-export { STORE };
+export { STORE, DB_NAME };

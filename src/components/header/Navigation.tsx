@@ -23,7 +23,7 @@ import {
   isDarkModeState,
   openDictModeState,
 } from '../../recoil/settingAtom';
-import { currWordListState } from '../../recoil/wordListState';
+import { currWordListState } from '../../recoil/wordListAtom';
 import Save from '../Save';
 import DarkModeToggle from './DarkModeToggle';
 

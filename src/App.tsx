@@ -11,7 +11,7 @@ import WordListNav from './components/WordListNav';
 import './index.css';
 import { isDarkModeState } from './recoil/settingAtom';
 import { isLoadingOcrState, isNowEditingState } from './recoil/stateAtom';
-import { currWordListLengthQuery } from './recoil/wordListState';
+import { currWordListLengthQuery } from './recoil/wordListAtom';
 
 function App() {
   const isExist = useRecoilValue(currWordListLengthQuery);

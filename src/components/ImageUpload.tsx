@@ -17,7 +17,7 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import imageRotateWorker from '../pwa/ImageRotate';
 import imageToJpegDataUrlWorker from '../pwa/ImageToJpegDataUrl';
 import { cropState, isLoadingOcrState } from '../recoil/stateAtom';
-import { currWordListState } from '../recoil/wordListState';
+import { currWordListState } from '../recoil/wordListAtom';
 import { dataURItoBlob } from '../util/dataURItoBlob';
 import rotateDataUrlOfImage from '../util/rotateImage';
 import NoContent from './NoContent';

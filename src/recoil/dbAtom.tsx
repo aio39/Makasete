@@ -1,10 +1,10 @@
 import { openDB } from 'idb';
 import { atom, selector } from 'recoil';
-import { STORE } from '../const';
+import { DB_NAME, STORE } from '../const';
 
 export const indexedDBState = atom({
   key: 'indexedDB',
-  default: openDB('db1', 1, {
+  default: openDB(DB_NAME, 1, {
     upgrade(db) {
       db.createObjectStore(STORE, {
         keyPath: 'id',
