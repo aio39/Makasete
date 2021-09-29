@@ -2,9 +2,9 @@ import { FC, useState } from 'react';
 import { useModal } from 'react-hooks-use-modal';
 import Iframe from 'react-iframe';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { openDictModeState } from '../recoil/settingAtom';
-import { currWordListState } from '../recoil/wordListAtom';
-import removeOneItemFromArray from '../util/removeOneItemFromArray';
+import { openDictModeState } from '../../../recoil/settingAtom';
+import { currWordListState } from '../../../recoil/wordListAtom';
+import removeOneItemFromArray from '../../../util/removeOneItemFromArray';
 
 const DICT_URL = 'https://ja.dict.naver.com/#/search?range=word&query=';
 

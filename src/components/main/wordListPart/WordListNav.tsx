@@ -1,5 +1,5 @@
 import { useRecoilValue } from 'recoil';
-import { currWordListLengthQuery } from '../recoil/wordListAtom';
+import { currWordListLengthQuery } from '../../../recoil/wordListAtom';
 
 const WordListNav = () => {
   const length = useRecoilValue(currWordListLengthQuery);

@@ -19,7 +19,9 @@ import { cropState, isLoadingOcrState } from '../recoil/stateAtom';
 import { currWordListState } from '../recoil/wordListAtom';
 import { dataURItoBlob } from '../util/dataURItoBlob';
 import rotateDataUrlOfImage from '../util/rotateImage';
-import NoContent from './NoContent';
+import NoContent from './common/NoContent';
+import OcrModeRadio from './main/Controller/OcrModeRadio';
+import CroppedImageList from './main/CroppedImageList';
 import CropZone from './uploadPart/CropZone';
 import EditButton from './uploadPart/EditButton';
 import ImageInputZone from './uploadPart/ImageInputZone';
@@ -243,12 +245,6 @@ const ImageUpload = () => {
     setCompletedCrop(null);
   };
 
-  const handleOCRMode: React.FormEventHandler<HTMLElement> = (e) => {
-    if (e.target instanceof HTMLInputElement) {
-      setOcrMode(e.target.value);
-    }
-  };
-
   return (
     <section className="w-full flex flex-col items-center">
       <ImageInputZone
@@ -261,45 +257,18 @@ const ImageUpload = () => {
         setCompletedCrop={setCompletedCrop}
       />
       {uploadedImage ? (
-        <div className="overflow-x-scroll  w-full pt-4 ">
-          <div
-            className="flex flex-row justify-center w-full mb-6 "
-            onClick={handleDeleteCrop}
-          >
-            {croppedImageDataUrlList.length === 0 ? (
-              <NoContent text="이미지를 크롭해주세요." tail="h-40" />
-            ) : (
-              croppedImageDataUrlList.map((imgUrl, idx) => (
-                <div
-                  key={'cropImage' + idx}
-                  className="group w-40 h-40 relative border-2 border-gray-700 flex-shrink-0 mx-3"
-                >
-                  <span className={isLoadingOcr ? 'ocrLoader' : ''}></span>
-                  <button
-                    data-idx={idx}
-                    className="hidden z-10 group-hover:block absolute text-2xl m-auto inset-0 w-full  cursor-pointer "
-                  >
-                    삭제
-                  </button>
-                  <div className="absolute m-auto w-full h-full bg-gray-700  bg-opacity-0 group-hover:bg-opacity-50"></div>
-                  <img
-                    src={imgUrl}
-                    className="w-40 h-40 "
-                    alt={`크롭된 이미지 ${idx}`}
-                  />
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+        <CroppedImageList
+          handleDeleteCrop={handleDeleteCrop}
+          croppedImageDataUrlList={croppedImageDataUrlList}
+          isLoadingOcr={isLoadingOcr}
+        />
       ) : (
         <NoContent
           text="이미지를 업로드 해주세요"
           tail="p-32 max-w-screen-md  border border-opacity-50 mb-12"
         />
       )}
-
-      {!false && (
+      {uploadedImage && (
         <div className="flex flex-col items-center ">
           <div className="text-2xl w-full max-w-screen-md flex  justify-between mb-4">
             {(
@@ -316,39 +285,7 @@ const ImageUpload = () => {
               <EditButton key={'editBtn' + idx} btnData={btnData} idx={idx} />
             ))}
           </div>
-          <div
-            onChange={handleOCRMode}
-            className="flex w-full justify-around mb-2"
-          >
-            <label
-              htmlFor="단어모드"
-              className=" flex justify-center items-center"
-            >
-              <input
-                id="단어모드"
-                type="radio"
-                value="0"
-                name="단어모드"
-                checked={ocrMode === '0'}
-                className="mr-2 text-mint"
-              />
-              단어 리스트
-            </label>
-            <label
-              htmlFor="문장모드"
-              className=" flex justify-center items-center "
-            >
-              <input
-                id="문장모드"
-                type="radio"
-                value="1"
-                name="문장모드"
-                checked={ocrMode === '1'}
-                className="mr-2 text-mint "
-              />
-              문장
-            </label>
-          </div>
+          <OcrModeRadio ocrMode={ocrMode} setOcrMode={setOcrMode} />
           <div>
             <button
               onClick={handleSendToServer}

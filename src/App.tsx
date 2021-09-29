@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import Footer from './components/footer/footer';
 import Navigation from './components/header/Navigation';
 import ImageUpload from './components/ImageUpload';
-import Loading from './components/Loading';
-import WordList from './components/WordList';
-import WordListNav from './components/WordListNav';
+import Loading from './components/main/Loading';
+import WordList from './components/main/wordListPart/WordList';
+import WordListNav from './components/main/wordListPart/WordListNav';
 // import './App.css';
 import './index.css';
 import { isDarkModeState } from './recoil/settingAtom';
@@ -54,6 +55,7 @@ function App() {
         {isExist ? <WordListNav /> : ''}
         <Footer />
       </div>
+      <ToastContainer />
     </div>
   );
 }

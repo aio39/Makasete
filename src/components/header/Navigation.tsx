@@ -24,8 +24,8 @@ import {
   openDictModeState,
 } from '../../recoil/settingAtom';
 import { currWordListState } from '../../recoil/wordListAtom';
-import Save from '../Save';
 import DarkModeToggle from './DarkModeToggle';
+import Save from './Save';
 
 const OptionModal: FC<{}> = () => {
   const [openDictMode, setOpenDictMode] = useRecoilState(openDictModeState);

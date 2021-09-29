@@ -2,8 +2,8 @@
 import { FC } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { STORE } from '../const';
-import { dbDictListQueryUpdater, indexedDBState } from '../recoil/dbAtom';
+import { STORE } from '../../const';
+import { dbDictListQueryUpdater, indexedDBState } from '../../recoil/dbAtom';
 
 const Save: FC<{ idbKey: string; value: any }> = ({ idbKey: key, value }) => {
   const dbPromise = useRecoilValue(indexedDBState);
