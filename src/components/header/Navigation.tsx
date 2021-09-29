@@ -11,10 +11,12 @@ import ReactGA from 'react-ga';
 import { useModal } from 'react-hooks-use-modal';
 import { GiHelp } from 'react-icons/gi';
 import { IoSave, IoSettingsSharp } from 'react-icons/io5';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
   cropFpsState,
   dbDictListQuery,
+  dbDictListQueryUpdate,
+  indexedDBState,
   isDarkModeState,
   openDictModeState,
   textState,
@@ -105,16 +107,45 @@ const HelpModal: FC<{}> = () => {
 };
 
 const SavedList = () => {
-  const a = useRecoilValue(dbDictListQuery);
+  const loadedList = useRecoilValue(dbDictListQuery);
+  const dbPromise = useRecoilValue(indexedDBState);
+  const setTextState = useSetRecoilState(textState);
+  const setDbDictListQueryUpdate = useSetRecoilState(dbDictListQueryUpdate);
+
+  const handler: MouseEventHandler<HTMLDivElement> = async (e) => {
+    if (e.target instanceof HTMLButtonElement) {
+      const { key, type } = e.target.dataset;
+      if (!key || !type) return;
+      const db = await dbPromise;
+      if (type === 'load') {
+        const data = await db.get('store1', key);
+        setTextState(data);
+        console.log(data, 'db에서 불러옴');
+      }
+      if (type === 'delete') {
+        const data = await db.delete('store1', key);
+      }
+      setDbDictListQueryUpdate((v) => !v);
+    }
+  };
+
   return (
     <>
-      {a
-        ? a.map((key) => (
-            <li key={key as string}>
-              {key} <button>불러오기</button>
-            </li>
-          ))
-        : '저장된 단어가 없습니다.'}
+      <div onClick={handler}>
+        {loadedList
+          ? loadedList.map((key) => (
+              <li key={key as string}>
+                {key}{' '}
+                <button data-key={key} data-type="load">
+                  불러오기
+                </button>{' '}
+                <button data-key={key} data-type="delete">
+                  삭제하기
+                </button>
+              </li>
+            ))
+          : '저장된 단어가 없습니다.'}
+      </div>
     </>
   );
 };
