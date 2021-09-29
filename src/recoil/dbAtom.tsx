@@ -4,11 +4,9 @@ import { DB_NAME, STORE } from '../const';
 
 export const indexedDBState = atom({
   key: 'indexedDB',
-  default: openDB(DB_NAME, 1, {
+  default: openDB(DB_NAME, 2, {
     upgrade(db) {
-      db.createObjectStore(STORE, {
-        keyPath: 'id',
-      });
+      db.createObjectStore(STORE);
     },
   }),
 });
