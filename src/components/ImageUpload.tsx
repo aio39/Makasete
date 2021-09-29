@@ -12,7 +12,7 @@ import { AiOutlineRotateRight } from 'react-icons/ai';
 import { BiReset } from 'react-icons/bi';
 import { IoCut } from 'react-icons/io5';
 import { Crop } from 'react-image-crop';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import imageRotateWorker from '../pwa/ImageRotate';
 import imageToJpegDataUrlWorker from '../pwa/ImageToJpegDataUrl';
@@ -249,7 +249,6 @@ const ImageUpload = () => {
     }
   };
 
-  const notify = () => toast('Wow so easy!');
   return (
     <section className="w-full flex flex-col items-center">
       <ImageInputZone
@@ -363,7 +362,6 @@ const ImageUpload = () => {
           </div>
         </div>
       )}
-      <button onClick={notify}>Notify!</button>
       <ToastContainer />
     </section>
   );
