@@ -4,7 +4,11 @@ module.exports = {
   purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   darkMode: 'class', // or 'media' or 'class'
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        // 'ani-big' : '  '
+      },
+    },
     colors: {
       transparent: 'transparent',
       current: 'currentColor',
@@ -15,7 +19,9 @@ module.exports = {
       red: colors.rose,
       yellow: colors.amber,
       mint: {
+        dark: '#227872',
         DEFAULT: '#39c5bb',
+        light: '#3FDACE',
       },
     },
   },

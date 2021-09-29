@@ -2,6 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* h1 {
+    @apply text-2xl;
+  } */
+}
+
+@layer components {
+  .btn-blue {
+    @apply py-2 px-4 bg-mint text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-mint focus:ring-opacity-75;
+  }
+  .trans-big {
+    @apply transition-all duration-100 ease-in-out transform-gpu hover:scale-105 hover:-translate-y-1
+  }
+  .btn-base {
+    @apply bg-mint text-white  py-2 px-4 rounded-sm my-4
+  }
+  .btn-active {
+    @apply btn-base hover:bg-mint-light cursor-pointer trans-big
+  }
+  .btn-inactive {
+    @apply btn-base bg-opacity-30 cursor-default text-gray-300
+  }
+
+   @variants responsive, hover {
+    .btn-active {
+      /* @apply py-2 px-4 bg-mint; */
+    }
+  }
+}
+
+@layer utilities {
+  /* @variants hover, focus {
+    .filter-none {
+      filter: none;
+    }
+    .filter-grayscale {
+      filter: grayscale(100%);
+    }
+  } */
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

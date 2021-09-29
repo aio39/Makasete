@@ -12,7 +12,6 @@ import { AiOutlineRotateRight } from 'react-icons/ai';
 import { BiReset } from 'react-icons/bi';
 import { IoCut } from 'react-icons/io5';
 import { Crop } from 'react-image-crop';
-import { ToastContainer } from 'react-toastify';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import imageRotateWorker from '../pwa/ImageRotate';
 import imageToJpegDataUrlWorker from '../pwa/ImageToJpegDataUrl';
@@ -354,16 +353,15 @@ const ImageUpload = () => {
             <button
               onClick={handleSendToServer}
               // disabled={croppedImageDataUrlList.length === 0}
-              className={`bg-mint text-white py-2 px-4 rounded-sm my-4  ${
-                croppedImageDataUrlList?.length || 'bg-opacity-30'
-              } `}
+              className={
+                croppedImageDataUrlList?.length ? 'btn-active' : 'btn-inactive'
+              }
             >
               단어 리스트 생성
             </button>
           </div>
         </div>
       )}
-      <ToastContainer />
     </section>
   );
 };
