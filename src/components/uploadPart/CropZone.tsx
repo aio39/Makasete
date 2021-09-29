@@ -3,7 +3,8 @@ import React, { FC, memo, useCallback } from 'react';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { cropFpsState, cropState } from '../../recoil/atom';
+import { cropFpsState } from '../../recoil/settingAtom';
+import { cropState } from '../../recoil/stateAtom';
 import './overwriteCropStyle.css';
 
 interface ICropZone {

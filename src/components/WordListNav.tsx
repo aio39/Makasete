@@ -1,8 +1,8 @@
 import { useRecoilValue } from 'recoil';
-import { wordListLength } from '../recoil/atom';
+import { currWordListLengthQuery } from '../recoil/wordListState';
 
 const WordListNav = () => {
-  const length = useRecoilValue(wordListLength);
+  const length = useRecoilValue(currWordListLengthQuery);
 
   return (
     <div className="sticky max-w-min bg-mint bg-opacity-30 flex justify-center mx-auto bottom-4 py-2 px-4 my-4 rounded-md">

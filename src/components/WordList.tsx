@@ -2,13 +2,14 @@ import { FC, useState } from 'react';
 import { useModal } from 'react-hooks-use-modal';
 import Iframe from 'react-iframe';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { openDictModeState, textState } from '../recoil/atom';
+import { openDictModeState } from '../recoil/settingAtom';
+import { currWordListState } from '../recoil/wordListState';
 import removeOneItemFromArray from '../util/removeOneItemFromArray';
 
 const DICT_URL = 'https://ja.dict.naver.com/#/search?range=word&query=';
 
 const WordList: FC<any> = () => {
-  const [wordListsData, setWordListsData] = useRecoilState(textState);
+  const [wordListsData, setWordListsData] = useRecoilState(currWordListState);
   const openDictMode = useRecoilValue(openDictModeState);
   const [selectedWord, setSelectedWord] = useState<string>();
   const [Modal, open, close] = useModal('root', {

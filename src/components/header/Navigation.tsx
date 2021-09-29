@@ -12,15 +12,18 @@ import { useModal } from 'react-hooks-use-modal';
 import { GiHelp } from 'react-icons/gi';
 import { IoSave, IoSettingsSharp } from 'react-icons/io5';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { STORE } from '../../const';
+import {
+  dbDictListQuery,
+  dbDictListQueryUpdater,
+  indexedDBState,
+} from '../../recoil/dbAtom';
 import {
   cropFpsState,
-  dbDictListQuery,
-  dbDictListQueryUpdate,
-  indexedDBState,
   isDarkModeState,
   openDictModeState,
-  textState,
-} from '../../recoil/atom';
+} from '../../recoil/settingAtom';
+import { currWordListState } from '../../recoil/wordListState';
 import Save from '../Save';
 import DarkModeToggle from './DarkModeToggle';
 
@@ -95,13 +98,16 @@ const HelpModal: FC<{}> = () => {
   return (
     <>
       <h2 className="text-4xl my-6  font-mono font-bold">도움말</h2>
-      <p>
-        도움말 입니다. 이미지에는 일본어 문자이외 (한글 등)이 들어가지 않도록
-        크롭해주세요. 이미지 업로드 직후 크롭 버튼을 누르면 전체 이미지로
-        크롭됩니다. 크롭만 제대로 된다면 이미지는 회전되어 있어도 상관없습니다.
-        heic등의 특수 사진 포맷에서는 에러가 나타날 수 있습니다. 크로미늄
-        엔진에서 성능 이점을 누릴 수 있습니다.
-      </p>
+      <div>
+        <p>도움말 입니다.</p>
+        <p>
+          이미지에는 일본어 문자이외 (한글 등)이 들어가지 않도록 크롭해주세요.
+        </p>
+        <p>이미지 업로드 직후 크롭 버튼을 누르면 전체 이미지로 크롭됩니다.</p>
+        <p>크롭만 제대로 된다면 이미지는 회전되어 있어도 상관없습니다 </p>
+        <p>HEIC등의 특수 사진 포맷에서는 에러가 나타날 수 있습니다. </p>
+        <p>크로미늄 엔진에서 성능 이점을 누릴 수 있습니다.</p>
+      </div>
     </>
   );
 };
@@ -109,8 +115,8 @@ const HelpModal: FC<{}> = () => {
 const SavedList = () => {
   const loadedList = useRecoilValue(dbDictListQuery);
   const dbPromise = useRecoilValue(indexedDBState);
-  const setTextState = useSetRecoilState(textState);
-  const setDbDictListQueryUpdate = useSetRecoilState(dbDictListQueryUpdate);
+  const setTextState = useSetRecoilState(currWordListState);
+  const setDbDictListQueryUpdate = useSetRecoilState(dbDictListQueryUpdater);
 
   const handler: MouseEventHandler<HTMLDivElement> = async (e) => {
     if (e.target instanceof HTMLButtonElement) {
@@ -118,11 +124,11 @@ const SavedList = () => {
       if (!key || !type) return;
       const db = await dbPromise;
       if (type === 'load') {
-        const data = await db.get('store1', key);
+        const data = await db.get(STORE, key);
         setTextState(data);
       }
       if (type === 'delete') {
-        const data = await db.delete('store1', key);
+        const data = await db.delete(STORE, key);
       }
       setDbDictListQueryUpdate((v) => !v);
     }
@@ -151,7 +157,7 @@ const SavedList = () => {
 
 const SaveModal: FC<{}> = () => {
   const [newDictName, setNewDictName] = useState('');
-  const nowWordList = useRecoilValue(textState);
+  const nowWordList = useRecoilValue(currWordListState);
   return (
     <>
       <h2 className="text-4xl my-6  font-mono font-bold">불러오기</h2>

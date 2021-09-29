@@ -2,14 +2,12 @@
 import { FC } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { dbDictListQueryUpdate, indexedDBState } from '../recoil/atom';
-
-const STORE = 'store1';
+import { STORE } from '../const';
+import { dbDictListQueryUpdater, indexedDBState } from '../recoil/dbAtom';
 
 const Save: FC<{ idbKey: string; value: any }> = ({ idbKey: key, value }) => {
   const dbPromise = useRecoilValue(indexedDBState);
-  const setDbDictListQueryUpdate = useSetRecoilState(dbDictListQueryUpdate);
-  const a = useRecoilValue(dbDictListQueryUpdate);
+  const setDbDictListQueryUpdate = useSetRecoilState(dbDictListQueryUpdater);
   const handleSave = async () => {
     const db = await dbPromise;
     await db
@@ -27,7 +25,6 @@ const Save: FC<{ idbKey: string; value: any }> = ({ idbKey: key, value }) => {
   return (
     <button className="p-3 bg-red-100" onClick={handleSave}>
       새로운 단어장 저장
-      {a ? 'T' : 'F'}
     </button>
   );
 };

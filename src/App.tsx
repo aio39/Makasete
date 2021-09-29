@@ -9,15 +9,12 @@ import WordList from './components/WordList';
 import WordListNav from './components/WordListNav';
 // import './App.css';
 import './index.css';
-import {
-  isDarkModeState,
-  isLoadingOcrState,
-  isNowEditingState,
-  wordListLength,
-} from './recoil/atom';
+import { isDarkModeState } from './recoil/settingAtom';
+import { isLoadingOcrState, isNowEditingState } from './recoil/stateAtom';
+import { currWordListLengthQuery } from './recoil/wordListState';
 
 function App() {
-  const isExist = useRecoilValue(wordListLength);
+  const isExist = useRecoilValue(currWordListLengthQuery);
   const isNowEditing = useRecoilValue(isNowEditingState);
   const isLoadingOcr = useRecoilValue(isLoadingOcrState);
   const [isDarkMode, setIsDarkMode] = useRecoilState(isDarkModeState);

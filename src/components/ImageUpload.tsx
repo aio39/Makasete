@@ -16,7 +16,8 @@ import { ToastContainer } from 'react-toastify';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import imageRotateWorker from '../pwa/ImageRotate';
 import imageToJpegDataUrlWorker from '../pwa/ImageToJpegDataUrl';
-import { cropState, isLoadingOcrState, textState } from '../recoil/atom';
+import { cropState, isLoadingOcrState } from '../recoil/stateAtom';
+import { currWordListState } from '../recoil/wordListState';
 import { dataURItoBlob } from '../util/dataURItoBlob';
 import rotateDataUrlOfImage from '../util/rotateImage';
 import NoContent from './NoContent';
@@ -66,7 +67,7 @@ const ImageUpload = () => {
   const [ocrMode, setOcrMode] = useState('0');
 
   const [isLoadingOcr, setIsLoadingOcr] = useRecoilState(isLoadingOcrState);
-  const setTextState = useSetRecoilState(textState);
+  const setTextState = useSetRecoilState(currWordListState);
   const setCrop = useSetRecoilState(cropState);
 
   useEffect(() => {
@@ -294,7 +295,7 @@ const ImageUpload = () => {
         </div>
       ) : (
         <NoContent
-          text="이미지를 업로드 해주세요."
+          text="이미지를 업로드 해주세요"
           tail="p-32 max-w-screen-md  border border-opacity-50 mb-12"
         />
       )}
