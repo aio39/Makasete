@@ -74,7 +74,6 @@ export const dbDictListQueryUpdate = atom({
 export const dbDictListQuery = selector({
   key: 'dbDictList',
   get: async ({ get }) => {
-    console.log('re update');
     get(dbDictListQueryUpdate);
     const list = await (await get(indexedDBState))
       .getAllKeys('store1')
@@ -82,7 +81,6 @@ export const dbDictListQuery = selector({
         console.error(err);
         return [];
       });
-    console.log(list);
     if (list.length === 0) return false as false;
     return list;
   },
@@ -90,12 +88,4 @@ export const dbDictListQuery = selector({
   cachePolicy_UNSTABLE: {
     eviction: 'most-recent',
   },
-  // set: ({ get }, newValue) => {
-  //   console.log(newValue);
-  // },
 });
-
-// export const saveWordQuery = selector({
-//   key: 'dbDictList',
-
-// });

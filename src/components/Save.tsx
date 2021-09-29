@@ -10,34 +10,6 @@ const Save: FC<{ idbKey: string; value: any }> = ({ idbKey: key, value }) => {
   const dbPromise = useRecoilValue(indexedDBState);
   const setDbDictListQueryUpdate = useSetRecoilState(dbDictListQueryUpdate);
   const a = useRecoilValue(dbDictListQueryUpdate);
-  //   useEffect(() => {
-  //     // const dbRun = async () => {
-  //     //   const db1 = await dbPromise;
-
-  //     //   await db1.put(STORE, 'hello world', 'word').catch((err) => {
-  //     //     console.error(err);
-  //     //   });
-  //     //   const a = await db1.get(STORE, 'listA').catch((err) => {
-  //     //     console.error(err);
-  //     //   });
-  //     //   const b = await db1.getAllKeys(STORE).catch((err) => {
-  //     //     console.error(err);
-  //     //   });
-
-  //     //   const c = await db1.count(STORE).catch((err) => {
-  //     //     console.error(err);
-  //     //   });
-
-  //     //   console.log(a, b, c);
-  //     //   console.log(b);
-  //     //   console.log(c);
-
-  //     //   db1.close();
-  //     // };
-  //     // dbRun();
-
-  //     return () => {};
-  //   }, []);
   const handleSave = async () => {
     const db = await dbPromise;
     await db

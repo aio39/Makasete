@@ -120,7 +120,6 @@ const SavedList = () => {
       if (type === 'load') {
         const data = await db.get('store1', key);
         setTextState(data);
-        console.log(data, 'db에서 불러옴');
       }
       if (type === 'delete') {
         const data = await db.delete('store1', key);
