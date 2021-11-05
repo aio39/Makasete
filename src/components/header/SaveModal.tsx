@@ -1,4 +1,5 @@
 import { FC, MouseEventHandler, Suspense, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { STORE } from '../../const';
 import {
@@ -22,10 +23,16 @@ const SavedList = () => {
       const db = await dbPromise;
       if (type === 'load') {
         const data = await db.get(STORE, key);
-        setTextState(data);
+        if (data) {
+          setTextState(data);
+          toast('불러오기 성공');
+        } else {
+          toast('불러오기 실패');
+        }
       }
       if (type === 'delete') {
-        const data = await db.delete(STORE, key);
+        await db.delete(STORE, key);
+        toast('삭제 성공');
       }
       setDbDictListQueryUpdate((v) => !v);
     }
@@ -33,20 +40,39 @@ const SavedList = () => {
 
   return (
     <>
-      <div onClick={handler}>
-        {loadedList
-          ? loadedList.map((key) => (
-              <li key={key as string} className="">
-                {key}{' '}
-                <button data-key={key} data-type="load">
+      <div onClick={handler} className="w-full">
+        {loadedList ? (
+          loadedList.map((key) => (
+            <li
+              key={key as string}
+              className="list-none w-full flex justify-start cursor-pointer hover:text-blue-400 hover:bg-blue-100 rounded-md px-2 py-2 my-2 flex-wrap md:flex-nowrap "
+            >
+              <span className="bg-mint h-2 w-2 m-2 rounded-full flex-shrink-0"></span>
+              <span className="font-medium px-2 text-lg  break-all">{key}</span>
+              <div className="flex-grow   w-full md:w-auto"></div>
+              <div className="text-sm font-normal  tracking-wide flex-shrink-0  ml-4  my-2  md:ml-0 md:my-0  ">
+                <button
+                  data-key={key}
+                  data-type="load"
+                  className="bg-mint px-4 py-2 rounded-sm mr-2"
+                >
                   불러오기
-                </button>{' '}
-                <button data-key={key} data-type="delete">
+                </button>
+                <button
+                  data-key={key}
+                  data-type="delete"
+                  className="bg-red-500 px-4 py-2 rounded-sm mr-2"
+                >
                   삭제하기
                 </button>
-              </li>
-            ))
-          : '저장된 단어가 없습니다.'}
+              </div>
+            </li>
+          ))
+        ) : (
+          <div className="flex justify-center my-6">
+            저장된 단어가 없습니다.
+          </div>
+        )}
       </div>
     </>
   );
@@ -57,14 +83,14 @@ export const SaveModal: FC<{}> = () => {
   const nowWordList = useRecoilValue(currWordListState);
   return (
     <>
-      <h2 className="text-4xl my-6  font-mono font-bold">저장된 데이터터</h2>
+      <h2 className="text-4xl my-6  font-mono font-bold">저장된 데이터</h2>
       <Suspense fallback={<div>loading</div>}>
         <SavedList />
-
+        <div className="border-b-2 border-gray-600 w-full my-4"></div>
         <input
           type="text"
           name="dictName"
-          className="text-black placeholder-opacity-60"
+          className="text-black placeholder-opacity-60 w-4/5"
           onChange={(e) => {
             setNewDictName(e.target.value);
           }}

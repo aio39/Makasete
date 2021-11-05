@@ -12,6 +12,7 @@ const SaveWordListBtn: FC<{ idbKey: string; value: any }> = ({
   const dbPromise = useRecoilValue(indexedDBState);
   const setDbDictListQueryUpdate = useSetRecoilState(dbDictListQueryUpdater);
   const handleSave = async () => {
+    console.log('aaaaa');
     if (key.length === 0) return;
     const db = await dbPromise;
     await db
@@ -30,7 +31,7 @@ const SaveWordListBtn: FC<{ idbKey: string; value: any }> = ({
     <button
       className={key.length ? 'btn-active' : 'btn-inactive'}
       onClick={handleSave}
-      disabled={key.length > 0 ? true : false}
+      disabled={key.length === 0 ? true : false}
     >
       새로운 단어장 저장
     </button>
