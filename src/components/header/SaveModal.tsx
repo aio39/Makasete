@@ -7,7 +7,7 @@ import {
   indexedDBState,
 } from '../../recoil/dbAtom';
 import { currWordListState } from '../../recoil/wordListAtom';
-import Save from './Save';
+import SaveWordListBtn from './Save';
 
 const SavedList = () => {
   const loadedList = useRecoilValue(dbDictListQuery);
@@ -36,7 +36,7 @@ const SavedList = () => {
       <div onClick={handler}>
         {loadedList
           ? loadedList.map((key) => (
-              <li key={key as string}>
+              <li key={key as string} className="">
                 {key}{' '}
                 <button data-key={key} data-type="load">
                   불러오기
@@ -57,20 +57,21 @@ export const SaveModal: FC<{}> = () => {
   const nowWordList = useRecoilValue(currWordListState);
   return (
     <>
-      <h2 className="text-4xl my-6  font-mono font-bold">불러오기</h2>
+      <h2 className="text-4xl my-6  font-mono font-bold">저장된 데이터터</h2>
       <Suspense fallback={<div>loading</div>}>
         <SavedList />
 
         <input
           type="text"
           name="dictName"
-          className="text-black"
+          className="text-black placeholder-opacity-60"
           onChange={(e) => {
             setNewDictName(e.target.value);
           }}
+          placeholder="단어장 이름"
           value={newDictName}
         />
-        <Save idbKey={newDictName} value={nowWordList} />
+        <SaveWordListBtn idbKey={newDictName} value={nowWordList} />
       </Suspense>
     </>
   );

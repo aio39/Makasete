@@ -3,15 +3,13 @@ import { MouseEventHandler, useState } from 'react';
 import ReactGA from 'react-ga';
 import { useModal } from 'react-hooks-use-modal';
 import { GiHelp } from 'react-icons/gi';
-import { IoSave, IoSettingsSharp } from 'react-icons/io5';
+import { IoCloseSharp, IoSave, IoSettingsSharp } from 'react-icons/io5';
 import { useRecoilValue } from 'recoil';
 import { isDarkModeState } from '../../recoil/settingAtom';
 import DarkModeToggle from './DarkModeToggle';
 import { HelpModal } from './HelpModal';
 import { OptionModal } from './OptionModal';
 import { SaveModal } from './SaveModal';
-
-
 
 const Navigation = () => {
   const [clickedModal, setClickedModal] = useState('help');
@@ -29,6 +27,12 @@ const Navigation = () => {
       ModalOpen();
     });
   };
+
+  // const modalList: { [x: string]: React.FC<{}> } = {
+  //   setting: OptionModal,
+  //   save: SaveModal,
+  //   help: HelpModal,
+  // };
 
   return (
     <header className="flex flex-row justify-between px-4 py-2 mb-6  bg-mint w-full h-12 shadow-lg ">
@@ -48,7 +52,6 @@ const Navigation = () => {
           className="text-3xl cursor-pointer mr-2"
           onClick={handleModalOpen}
         />
-        {/*  */}
         <ModalBox>
           <div
             className={`${
@@ -62,10 +65,10 @@ const Navigation = () => {
             {clickedModal === 'help' && <HelpModal />}
             <span
               aria-details="모달 창 닫기"
-              className="absolute top-2 right-4 text-2xl cursor-pointer"
+              className="absolute top-2 right-2 text-2xl cursor-pointer"
               onClick={ModalClose}
             >
-              X
+              <IoCloseSharp />
             </span>
           </div>
         </ModalBox>

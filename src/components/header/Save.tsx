@@ -5,10 +5,14 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { STORE } from '../../const';
 import { dbDictListQueryUpdater, indexedDBState } from '../../recoil/dbAtom';
 
-const Save: FC<{ idbKey: string; value: any }> = ({ idbKey: key, value }) => {
+const SaveWordListBtn: FC<{ idbKey: string; value: any }> = ({
+  idbKey: key,
+  value,
+}) => {
   const dbPromise = useRecoilValue(indexedDBState);
   const setDbDictListQueryUpdate = useSetRecoilState(dbDictListQueryUpdater);
   const handleSave = async () => {
+    if (key.length === 0) return;
     const db = await dbPromise;
     await db
       .put(STORE, value, key)
@@ -23,10 +27,14 @@ const Save: FC<{ idbKey: string; value: any }> = ({ idbKey: key, value }) => {
   };
 
   return (
-    <button className="p-3 bg-red-100" onClick={handleSave}>
+    <button
+      className={key.length ? 'btn-active' : 'btn-inactive'}
+      onClick={handleSave}
+      disabled={key.length > 0 ? true : false}
+    >
       새로운 단어장 저장
     </button>
   );
 };
 
-export default Save;
+export default SaveWordListBtn;
