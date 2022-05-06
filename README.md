@@ -33,3 +33,22 @@ Vercel デプロイリンク[URL](https://makasete.vercel.app/)
 ## Todo
 
 - [ ] Error: Too many text segments at new ApiError(GCP Api Error)
+
+## 動画
+
+### 文章モード
+
+https://user-images.githubusercontent.com/68348070/167058909-32f33da2-f751-403e-b5fc-c9c071dba689.mp4
+
+### 単語モード
+
+https://user-images.githubusercontent.com/68348070/167061793-613e6e5b-b782-4d55-8e46-f2cf38821751.mp4
+
+### ダークモード
+
+https://user-images.githubusercontent.com/68348070/167061809-cb0abeb4-22b4-47ae-acc6-2a7858e15a82.mp4
+
+
+
+
+
